@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pandas as pd
 from scipy.interpolate import interp1d
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -287,7 +288,7 @@ class Smooth17AHAPlot:
             self.data = data
 
         cmap = 'rainbow'
-        norm = (1200, 3000)
+        norm = (1000, 3000)
         fig, ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=1,
                                subplot_kw=dict(projection='polar'))
         fig = self.bullseye_smooth(fig=fig, ax=ax, cmap=cmap, norm=norm, title='Myocardial work index', units='mmHg%',
@@ -314,8 +315,16 @@ class Smooth17AHAPlot:
 if __name__ == '__main__':
     exp_strain_data = [-13, -14, -16, -19, -19, -18, -19, -23, -17, -21, -20, -20, -23, -24, -28, -25, -26]
     exp_mw_data = [1926, 1525, 1673, 2048, 2325, 2200, 2197, 2014, 1982, 2199, 2431, 2409, 2554, 2961, 2658, 2729, 2833]
-    aha = Smooth17AHAPlot(exp_strain_data, output_path='', plot_filename='17_AHA_strain.png')
-    aha.plot_strain()
-    aha.plot_myocardial_work('17_AHA_MW.png', data=exp_mw_data)
-    aha.plot_strain('17_AHA_Echo_strain.png', data=exp_strain_data, echop=True)
-    aha.plot_myocardial_work('17_AHA_Echo_MW.png', data=exp_mw_data, echop=True)
+    df_hyp = pd.read_excel('/home/mat/Python/data/parsing_xml/output/population_17_AHA.xlsx', index_col=0)
+    aha = Smooth17AHAPlot(exp_strain_data, output_path='/home/mat/Python/data/parsing_xml/output',
+                          plot_filename='17_AHA_strain.png')
+    aha.plot_strain('ctrl_strain.png', data=df_hyp.loc['mean_strain_avc_0'].values, echop=True)
+    aha.plot_strain('htn_strain.png', data=df_hyp.loc['mean_strain_avc_1'].values, echop=True)
+    aha.plot_strain('bsh_strain.png', data=df_hyp.loc['mean_strain_avc_2'].values, echop=True)
+    aha.plot_myocardial_work('ctrl_MW.png', data=df_hyp.loc['mean_MW_0'].values, echop=True)
+    aha.plot_myocardial_work('htn_MW.png', data=df_hyp.loc['mean_MW_1'].values, echop=True)
+    aha.plot_myocardial_work('bsh_MW.png', data=df_hyp.loc['mean_MW_2'].values, echop=True)
+    # aha.plot_strain()
+    # aha.plot_myocardial_work('17_AHA_MW.png', data=exp_mw_data)
+    # aha.plot_strain('17_AHA_Echo_strain.png', data=exp_strain_data, echop=True)
+    # aha.plot_myocardial_work('17_AHA_Echo_MW.png', data=exp_mw_data, echop=True)
