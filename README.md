@@ -1,4 +1,4 @@
-# Smooth 17 segment AHA bullseye plots
+# Smooth 17 and 18 segment AHA bullseye plots
 
 
 # Motivation
