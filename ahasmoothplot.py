@@ -126,9 +126,10 @@ class SmoothAHAPlot:
         res_y = self.resolution[1]
 
         # Extract values
-        basal = aha_values[:6]
-        mid = aha_values[6:12]
-        apical = aha_values[12:18]
+        basal = np.roll(aha_values[:6], 3)
+        mid = np.roll(aha_values[6:12], 3)
+        apical = np.roll(aha_values[12:18], 3)
+        self.data = np.append(basal, (mid, apical))
         apex = np.sum(apical) / 6
 
         # Set up the interpolation matrices
@@ -390,7 +391,7 @@ class SmoothAHAPlot:
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.84, int(self.data[i]), fontsize=20,
                     ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
-            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.5, int(self.data[i + 6]), fontsize=20,
+            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.55, int(self.data[i + 6]), fontsize=20,
                     ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.25, int(self.data[i + 12]), fontsize=20,
@@ -466,21 +467,24 @@ class SmoothAHAPlot:
                                           smooth_contour=True, echop=echop)
         fig.savefig(os.path.join(self.output_path, self.plot_filename))
 
+    def plot_all(self, df_path='', echop=True):
+
+        df_hyp = pd.read_excel(df_path, index_col=0)
+        aha.plot_strain('ctrl_strain.png', data=df_hyp.loc['mean_strain_avc_0'].values, echop=echop)
+        aha.plot_strain('htn_strain.png', data=df_hyp.loc['mean_strain_avc_1'].values, echop=echop)
+        aha.plot_strain('bsh_strain.png', data=df_hyp.loc['mean_strain_avc_2'].values, echop=echop)
+        aha.plot_myocardial_work('ctrl_MW.png', data=df_hyp.loc['mean_MW_0'].values, echop=echop)
+        aha.plot_myocardial_work('htn_MW.png', data=df_hyp.loc['mean_MW_1'].values, echop=echop)
+        aha.plot_myocardial_work('bsh_MW.png', data=df_hyp.loc['mean_MW_2'].values, echop=echop)
+
 
 if __name__ == '__main__':
-    exp_strain_data = [-13, -14, -16, -19, -19, -18, -19, -23, -1, -21, -20, -20, -23, 1, -28, -25, -26]
+    exp_strain_data = [-13, -14, -16, -19, -19, -18, -19, -23, -1, -21, -20, -20, -23, 1, -28, -25, -26, 27]
     exp_mw_data = [1926, 1525, 1673, 2048, 2325, 2200, 2197, 2014, 1982, 2199, 2431, 2409, 2554, 2961, 2658, 2729, 2833]
-    df_hyp = pd.read_excel('/home/mat/Python/data/parsing_xml/output/population_17_AHA.xlsx', index_col=0)
-    aha = SmoothAHAPlot(exp_strain_data, output_path='.',
-                        plot_filename='18_AHA_strain.png', n_segments=17)
 
-    aha.plot_strain('ctrl_strain.png', data=exp_strain_data, echop=False)
-    # aha.plot_strain('ctrl_strain.png', data=df_hyp.loc['mean_strain_avc_0'].values, echop=True)
-    # aha.plot_strain('htn_strain.png', data=df_hyp.loc['mean_strain_avc_1'].values, echop=True)
-    # aha.plot_strain('bsh_strain.png', data=df_hyp.loc['mean_strain_avc_2'].values, echop=True)
-    # aha.plot_myocardial_work('ctrl_MW.png', data=df_hyp.loc['mean_MW_0'].values, echop=True)
-    # aha.plot_myocardial_work('htn_MW.png', data=df_hyp.loc['mean_MW_1'].values, echop=True)
-    # aha.plot_myocardial_work('bsh_MW.png', data=df_hyp.loc['mean_MW_2'].values, echop=True)
+    aha = SmoothAHAPlot(exp_strain_data, output_path='/home/mat/Python/data/parsing_xml/output', plot_filename='18_AHA_strain.png', n_segments=18)
+    aha.plot_all('/home/mat/Python/data/parsing_xml/output/population_18_AHA.xlsx', echop=True)
+   
     # aha.plot_strain()
     # aha.plot_myocardial_work('17_AHA_MW.png', data=exp_mw_data)
     # aha.plot_strain('17_AHA_Echo_strain.png', data=exp_strain_data, echop=True)
