@@ -222,7 +222,7 @@ class SmoothAHAPlot:
 
         # -----Drawing bounds of the plot-------------------------------------------------------------------------------
         linewidth = 2
-        # Create the bound for the segment 17
+        # Create the radial bounds
         for i in range(r.shape[0]):
             ax.plot(theta, np.repeat(r[i], theta.shape), '-k', lw=linewidth)
 
@@ -240,7 +240,10 @@ class SmoothAHAPlot:
         # ==============================================================================================================
 
         # -----Linear interpolation-------------------------------------------------------------------------------------
-        interp_data = self._interpolate_17_aha_values(self.data)
+        if self.n_segments == 17:
+            interp_data = self._interpolate_17_aha_values(self.data)
+        else:
+            interp_data = self._interpolate_18_aha_values(self.data)
 
         r = np.linspace(0, 1, interp_data.shape[0])
         d_theta = 1 / interp_data.shape[1]
@@ -364,8 +367,11 @@ class SmoothAHAPlot:
         # ==============================================================================================================
 
         # -----Linear interpolation-------------------------------------------------------------------------------------
-        interp_data = self._interpolate_18_aha_values(self.data)
-
+        if self.n_segments == 17:
+            interp_data = self._interpolate_17_aha_values(self.data)
+        else:
+            interp_data = self._interpolate_18_aha_values(self.data)
+            
         r = np.linspace(0, 1, interp_data.shape[0])
         d_theta = 1 / interp_data.shape[1]
         d_r = 1 / interp_data.shape[0]
