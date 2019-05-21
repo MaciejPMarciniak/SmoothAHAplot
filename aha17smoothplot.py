@@ -371,7 +371,7 @@ class SmoothAHAPlot:
             interp_data = self._interpolate_17_aha_values(self.data)
         else:
             interp_data = self._interpolate_18_aha_values(self.data)
-            
+
         r = np.linspace(0, 1, interp_data.shape[0])
         d_theta = 1 / interp_data.shape[1]
         d_r = 1 / interp_data.shape[0]
@@ -406,6 +406,7 @@ class SmoothAHAPlot:
             cf.ax.axis('off')
         else:
             ax.pcolormesh(theta0, r0, z, cmap=cmap, norm=norm)
+        # ==============================================================================================================
 
         # -----Add plot featres-----------------------------------------------------------------------------------------
         # Create the axis for the colorbars
