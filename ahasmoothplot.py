@@ -21,19 +21,13 @@ class SmoothAHAPlot:
     Two helper methods are included, adjusted to plot myocardial work and strain values with proper scales.
     """
 
+    # If a pandas dataframe is provided, it should have the following names:
     AHA_17_SEGMENT_NAMES = ['Basal Anterior', 'Basal Anteroseptal', 'Basal Inferoseptal',
                             'Basal Inferior', 'Basal Inferolateral', 'Basal Anterolateral',
                             'Mid Anterior', 'Mid Anteroseptal', 'Mid Inferoseptal',
                             'Mid Inferior', 'Mid Inferolateral', 'Mid Anterolateral',
                             'Apical Anterior', 'Apical Septal', 'Apical Inferior', 'Apical Lateral', 'Apex']
-
-    AHA_18_SEGMENT_NAMES = ['Basal Anterior', 'Basal Anteroseptal', 'Basal Inferoseptal',
-                            'Basal Inferior', 'Basal Inferolateral', 'Basal Anterolateral',
-                            'Mid Anterior', 'Mid Anteroseptal', 'Mid Inferoseptal',
-                            'Mid Inferior', 'Mid Inferolateral', 'Mid Anterolateral',
-                            'Apical Anterior', 'Apical Anteroseptal', 'Apical Inferoseptal',
-                            'Apical Inferior', 'Apical Inferolateral', 'Apical Anterolateral']
-
+    # or
     ECHOP_18_SEGMENTS = ['Basal Anterior', 'Basal Anteroseptal', 'Basal Septal',
                          'Basal Inferior', 'Basal Posterior', 'Basal Lateral',
                          'Mid Anterior', 'Mid Anteroseptal', 'Mid Septal',
@@ -41,6 +35,10 @@ class SmoothAHAPlot:
                          'Apical Anterior', 'Apical Anteroseptal', 'Apical Septal',
                          'Apical Inferior', 'Apical Posterior', 'Apical Lateral']
 
+    # The actual names of the segments:
+    AHA_SEGMENT_NAMES = ['Anterior', 'Anteroseptal', 'Inferoseptal',
+                         'Inferior', 'Inferolateral', 'Anterolateral']
+    # EchoPAC version of the names:
     ECHOP_SEGMENT_ABBRV = ['ANT', 'ANT_SEPT', 'SEPT', 'INF', 'POST', 'LAT']
 
     def __init__(self, data, output_path='', plot_filename='AHA_plot.png', n_segments=17):
@@ -335,7 +333,7 @@ class SmoothAHAPlot:
         else:
             rot = [0, 60, -60, 0, 60, -60]
             seg_align = 90
-            seg_names = [col_name.split(' ')[1] for col_name in self.AHA_18_SEGMENT_NAMES[:6]]
+            seg_names = self.AHA_SEGMENT_NAMES
             seg_names_pos = np.repeat([0.06], 6)
 
         # -----Basic assumptions on resolution--------------------------------------------------------------------------
