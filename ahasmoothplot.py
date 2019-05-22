@@ -11,12 +11,12 @@ from matplotlib.ticker import MaxNLocator
 
 class SmoothAHAPlot:
     """
-    Class for producing smooth 17 segment left ventricle plot, recommended by American Heart Association:
+    Class for producing smooth 17 and 18 segment left ventricle plot, recommended by American Heart Association:
         http://www.pmod.com/files/download/v34/doc/pcardp/3615.htm
     Inspired with the 'bullseye plot':
         https://matplotlib.org/gallery/specialty_plots/leftventricle_bulleye.html
     Available at:
-        https://github.com/MaciejPMarciniak/smooth17AHAplot
+        https://github.com/MaciejPMarciniak/smoothAHAplot
 
     Two helper methods are included, adjusted to plot myocardial work and strain values with proper scales.
     """
@@ -32,9 +32,16 @@ class SmoothAHAPlot:
                             'Mid Anterior', 'Mid Anteroseptal', 'Mid Inferoseptal',
                             'Mid Inferior', 'Mid Inferolateral', 'Mid Anterolateral',
                             'Apical Anterior', 'Apical Anteroseptal', 'Apical Inferoseptal',
-                            'Apical Inferior', 'Apical Inferolateral', 'Apical Anterolateral',]
+                            'Apical Inferior', 'Apical Inferolateral', 'Apical Anterolateral']
 
-    ECHOP_SEGMENT_NAMES = ['ANT', 'ANT_SEPT', 'SEPT', 'INF', 'POST', 'LAT']
+    ECHOP_18_SEGMENTS = ['Basal Anterior', 'Basal Anteroseptal', 'Basal Septal',
+                         'Basal Inferior', 'Basal Posterior', 'Basal Lateral',
+                         'Mid Anterior', 'Mid Anteroseptal', 'Mid Septal',
+                         'Mid Inferior', 'Mid Posterior', 'Mid Lateral',
+                         'Apical Anterior', 'Apical Anteroseptal', 'Apical Septal',
+                         'Apical Inferior', 'Apical Posterior', 'Apical Lateral']
+
+    ECHOP_SEGMENT_ABBRV = ['ANT', 'ANT_SEPT', 'SEPT', 'INF', 'POST', 'LAT']
 
     def __init__(self, data, output_path='', plot_filename='AHA_plot.png', n_segments=17):
 
@@ -68,9 +75,7 @@ class SmoothAHAPlot:
         res_y = self.resolution[1]
 
         # Extract values
-        basal = aha_values[:6]
-        mid = aha_values[6:12]
-        apical = aha_values[12:16]
+        basal, mid, apical = aha_values[:6], aha_values[6:12], aha_values[12:16]
         apex = aha_values[16]
 
         # Set up the interpolation matrices
@@ -91,18 +96,14 @@ class SmoothAHAPlot:
             apical_interp[int(res_x / 4) * i:int(res_x / 4 * i + res_x / 4)] = \
                 np.linspace(apical[i], apical[(i + 1) % 4], int(res_x / 4))
 
-        # Align to the proper position of the segments
-        basal_interp = np.roll(basal_interp, int(res_x / 4))
-        mid_interp = np.roll(mid_interp, int(res_x / 4))
-        apical_interp = np.roll(apical_interp, int(res_x / 3)-32)
-
         # Helper arrays for better basal segments visualization
-        _tmp_basal = basal_interp * 4
+        _tmp_basal = basal_interp * 3
         _tmp_mid = mid_interp
-        _basal_low = (_tmp_basal + _tmp_mid) / 5
+        _basal_low = (_tmp_basal + _tmp_mid) / 4
 
         # Put it all together
         full_map = np.array([basal_interp, _basal_low, mid_interp, apical_interp, apex_interp])
+        full_map = np.roll(full_map, int(res_x/4), axis=1)
         full_map = np.flip(full_map, 0)
         y_0 = [0, 0.33, 0.55, 0.85, 1]
         f = interp1d(y_0, full_map, axis=0)
@@ -112,9 +113,9 @@ class SmoothAHAPlot:
 
     def _interpolate_18_aha_values(self, aha_values=None):
         """
-        Funtion to interpolate the initial 17 values, to achieve smooth transition among segments.
+        Funtion to interpolate the initial 18 values, to achieve smooth transition among segments.
         :param aha_values: list, tuple
-            The 17 values
+            The 18 values
         :return:
         """
         assert len(self.data) == 18, 'Please provide the proper number of segmental values for the 18 AHA plot. ' \
@@ -126,10 +127,7 @@ class SmoothAHAPlot:
         res_y = self.resolution[1]
 
         # Extract values
-        basal = np.roll(aha_values[:6], 3)
-        mid = np.roll(aha_values[6:12], 3)
-        apical = np.roll(aha_values[12:18], 3)
-        self.data = np.append(basal, (mid, apical))
+        basal, mid, apical = aha_values[:6], aha_values[6:12], aha_values[12:18]
         apex = np.sum(apical) / 6
 
         # Set up the interpolation matrices
@@ -149,11 +147,6 @@ class SmoothAHAPlot:
             apical_interp[int(res_x / 6) * i:int(res_x / 6 * i + res_x / 6)] = \
                 np.linspace(apical[i], apical[(i + 1) % 6], int(res_x / 6))
 
-        # Align to the proper position of the segments
-        basal_interp = np.roll(basal_interp, int(res_x / 4))
-        mid_interp = np.roll(mid_interp, int(res_x / 4))
-        apical_interp = np.roll(apical_interp, int(res_x / 4))
-
         # Helper arrays for better basal segments visualization
         _tmp_basal = basal_interp * 3
         _tmp_mid = mid_interp
@@ -161,7 +154,7 @@ class SmoothAHAPlot:
 
         # Put it all together
         full_map = np.array([basal_interp, _basal_low, mid_interp, apical_interp, apex_interp])
-        # full_map = np.roll(full_map, int(res_x / 4))
+        full_map = np.roll(full_map, int(res_x/4), axis=1)
         full_map = np.flip(full_map, 0)
         y_0 = [0, 0.28, 0.5, 0.8, 1]
         f = interp1d(y_0, full_map, axis=0)
@@ -204,12 +197,12 @@ class SmoothAHAPlot:
             rot = [0, 0, 0, 0, 0, 0]
             seg_align_12 = 30
             seg_align_13_16 = [40, 50, 40, 50]
-            seg_names = self.ECHOP_SEGMENT_NAMES
+            seg_names = self.ECHOP_SEGMENT_ABBRV
             seg_names_pos = [0.1, 0.06, 0.1, 0.1, 0.06, 0.1]
         else:
             rot = [0, 60, -60, 0, 60, -60]
             seg_align_12 = 90
-            seg_align_13_16 = np.repeat([90], 4)
+            seg_align_13_16 = np.repeat([0], 4)
             seg_names = [col_name.split(' ')[1] for col_name in self.AHA_17_SEGMENT_NAMES[:6]]
             seg_names_pos = np.repeat([0.06], 6)
 
@@ -338,7 +331,7 @@ class SmoothAHAPlot:
         if echop:
             rot = [0, 0, 0, 0, 0, 0]
             seg_align = 30
-            seg_names = self.ECHOP_SEGMENT_NAMES
+            seg_names = self.ECHOP_SEGMENT_ABBRV
             seg_names_pos = [0.1, 0.06, 0.1, 0.1, 0.06, 0.1]
         else:
             rot = [0, 60, -60, 0, 60, -60]
@@ -434,7 +427,7 @@ class SmoothAHAPlot:
                                                  'len(data) = {}, n_segments =  {}'.format(len(data), self.n_segments)
             self.data = data
 
-        cmap = 'rainbow'
+        cmap = plt.get_cmap('rainbow')
         norm = (1000, 3000)
         fig, ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=1,
                                subplot_kw=dict(projection='polar'))
@@ -470,6 +463,12 @@ class SmoothAHAPlot:
     def plot_all(self, df_path='', echop=True):
 
         df_hyp = pd.read_excel(df_path, index_col=0)
+
+        if self.n_segments == 17:
+            df_hyp = df_hyp.reindex(self.AHA_17_SEGMENT_NAMES, axis=1)
+        else:
+            df_hyp = df_hyp.reindex(self.ECHOP_18_SEGMENTS, axis=1)
+
         aha.plot_strain('ctrl_strain.png', data=df_hyp.loc['mean_strain_avc_0'].values, echop=echop)
         aha.plot_strain('htn_strain.png', data=df_hyp.loc['mean_strain_avc_1'].values, echop=echop)
         aha.plot_strain('bsh_strain.png', data=df_hyp.loc['mean_strain_avc_2'].values, echop=echop)
@@ -482,9 +481,12 @@ if __name__ == '__main__':
     exp_strain_data = [-13, -14, -16, -19, -19, -18, -19, -23, -1, -21, -20, -20, -23, 1, -28, -25, -26, 27]
     exp_mw_data = [1926, 1525, 1673, 2048, 2325, 2200, 2197, 2014, 1982, 2199, 2431, 2409, 2554, 2961, 2658, 2729, 2833]
 
-    aha = SmoothAHAPlot(exp_strain_data, output_path='/home/mat/Python/data/parsing_xml/output', plot_filename='18_AHA_strain.png', n_segments=18)
+    n_seg = 18
+    exp_strain_data = exp_strain_data[:n_seg]
+    aha = SmoothAHAPlot(exp_strain_data, output_path='/home/mat/Python/data/parsing_xml/output',
+                        plot_filename='17_AHA_strain.png', n_segments=n_seg)
     aha.plot_all('/home/mat/Python/data/parsing_xml/output/population_18_AHA.xlsx', echop=True)
-   
+
     # aha.plot_strain()
     # aha.plot_myocardial_work('17_AHA_MW.png', data=exp_mw_data)
     # aha.plot_strain('17_AHA_Echo_strain.png', data=exp_strain_data, echop=True)
