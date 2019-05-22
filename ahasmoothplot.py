@@ -75,8 +75,7 @@ class SmoothAHAPlot:
         res_y = self.resolution[1]
 
         # Extract values
-        basal, mid, apical = aha_values[:6], aha_values[6:12], aha_values[12:16]
-        apex = aha_values[16]
+        basal, mid, apical, apex = aha_values[:6], aha_values[6:12], aha_values[12:16], aha_values[16]
 
         # Set up the interpolation matrices
         basal_interp = np.zeros(res_x)
@@ -300,11 +299,11 @@ class SmoothAHAPlot:
     def bullseye_18_smooth(self, fig, ax, cmap='jet', norm=None, units='Units', title='Smooth 18 AHA plot',
                            smooth_contour=False, echop=False):
         """
-        Function to create the smooth representation of the AHA 17 segment plot
+        Function to create the smooth representation of the AHA 18 segment plot
         :param fig: matplotlib.pyplot.figure
             The plot is drawn on this figure
         :param ax: matplotlib.pyplot.axes
-            Axes of the figure, for 17 AHA and colorbar.
+            Axes of the figure, for 18 AHA and colorbar.
         :param cmap: ColorMap or None, optional
             Optional argument to set the desired colormap
         :param norm: tuple, BoundaryNorm or None
@@ -316,9 +315,9 @@ class SmoothAHAPlot:
         :param smooth_contour:
             Whether to smooth the plot. Useful for level-based color map
         :param echop: Bool
-            If true, the resultant plot is structured as the 17 AHA plots in GE EchoPAC (TM)
+            If true, the resultant plot is structured as the 18 AHA plots in GE EchoPAC (TM)
         :return fig: matplotlib.pyplot.figure
-            The figure on which the 17 AHA plot has been drawn
+            The figure on which the 18 AHA plot has been drawn
         """
 
         if norm is None:
