@@ -395,7 +395,7 @@ class SmoothAHAPlot:
 
         # -----Add plot featres-----------------------------------------------------------------------------------------
         # Create the axis for the colorbars
-        bar = fig.add_axes([0.12, 0.15, 0.2, 0.05])
+        bar = fig.add_axes([0.1, 0.1, 0.2, 0.05])
         cb1 = mpl.colorbar.ColorbarBase(bar, cmap=cmap, norm=norm, orientation='horizontal')
         cb1.set_label(units, size=16)
         cb1.ax.tick_params(labelsize=14, which='major')
@@ -460,23 +460,23 @@ class SmoothAHAPlot:
         else:
             df_hyp = df_hyp.reindex(self.ECHOP_18_SEGMENTS, axis=1)
 
-        aha.plot_strain('htn_strain_0_aha_EPC.png', data=df_hyp.loc['mean_strain_avc_0'].values, echop=echop)
-        aha.plot_strain('htn_strain_1_aha_EPC.png', data=df_hyp.loc['mean_strain_avc_1'].values, echop=echop)
-        aha.plot_myocardial_work('htn_MW_0_aha_EPC.png', data=df_hyp.loc['mean_MW_0'].values, echop=echop)
-        aha.plot_myocardial_work('htn_MW_1_aha_EPC.png', data=df_hyp.loc['mean_MW_1'].values, echop=echop)
-        aha.plot_strain('strain_all_EPC.png', data=df_hyp.loc['mean_strain_avc'].values, echop=echop)
-        aha.plot_myocardial_work('MW_all_EPC.png', data=df_hyp.loc['mean_MW'].values, echop=echop)
+        # aha.plot_strain('htn_strain_0_aha_EPC.png', data=df_hyp.loc['mean_strain_avc_0'].values, echop=echop)
+        aha.plot_strain('htn_strain_2_aha.png', data=df_hyp.loc['mean_strain_avc_2'].values, echop=echop)
+        # aha.plot_myocardial_work('htn_MW_0_aha_EPC.png', data=df_hyp.loc['mean_MW_0'].values, echop=echop)
+        aha.plot_myocardial_work('htn_MW_2_aha.png', data=df_hyp.loc['mean_MW_2'].values, echop=echop)
+        # aha.plot_strain('strain_all.png', data=df_hyp.loc['mean_strain_avc'].values, echop=echop)
+        # aha.plot_myocardial_work('MW_all.png', data=df_hyp.loc['mean_MW'].values, echop=echop)
 
 
 if __name__ == '__main__':
     exp_strain_data = [-13, -14, -16, -19, -19, -18, -19, -23, -1, -21, -20, -20, -23, 1, -28, -25, -26, 27]
     exp_mw_data = [1926, 1525, 1673, 2048, 2325, 2200, 2197, 2014, 1982, 2199, 2431, 2409, 2554, 2961, 2658, 2729, 2833]
 
-    n_seg = 17
+    n_seg = 18
     exp_strain_data = exp_strain_data[:n_seg]
-    aha = SmoothAHAPlot(exp_strain_data, output_path='/home/mat/Python/data/parsing_xml/mr_output',
+    aha = SmoothAHAPlot(exp_strain_data, output_path='/home/mat/Python/data/parsing_xml/29 random/output',
                         plot_filename='17_AHA_strain.png', n_segments=n_seg)
-    aha.plot_all('/home/mat/Python/data/parsing_xml/mr_output/population_17_AHA.xlsx', echop=True)
+    aha.plot_all('/home/mat/Python/data/parsing_xml/29 random/output/population_18_AHA.xlsx', echop=False)
 
     # aha.plot_strain()
     # aha.plot_myocardial_work('17_AHA_MW.png', data=exp_mw_data)
