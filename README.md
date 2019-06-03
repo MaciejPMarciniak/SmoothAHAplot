@@ -53,13 +53,12 @@ communication within echocardiography and across other imaging modalities.
 
 ---
 # How2use
+Two methods creating the most common plots are provided.
 
 ### class
 
 **Call**
 ```python
-from ahasmoothplot import SmoothAHAPlot
-
 # List of segments
 segments_18 = ['Basal Anterior', 'Basal Anteroseptal', 'Basal Inferoseptal',
                'Basal Inferior', 'Basal Inferolateral', 'Basal Anterolateral',
@@ -73,6 +72,8 @@ exp_strain_data = [-13, -14, -16, -19, -19, -18, -19, -23, -19, -21, -20, -20, -
 n_seg = len(exp_strain_data)
 
 strain_dict = {k: v for (k, v) in zip(segments_18, exp_strain_data)}
+
+from ahasmoothplot import SmoothAHAPlot
 
 # Create object
 aha = SmoothAHAPlot(strain_dict, output_path='./images', n_segments=n_seg)
@@ -92,7 +93,7 @@ aha.plot_strain('18_AHA_strain.png', data=strain_dict)
 ---
 **Methods**
 ```python
-plot_strain(self, filename='', data=None, echop=False)
+aha.plot_strain(filename='', data=None, echop=False)
 
 ```
 *filename*: name of the file to save figure
@@ -102,7 +103,7 @@ plot_strain(self, filename='', data=None, echop=False)
 *echop*: whether to use the EchoPAC format of the plot
 
 ```python
-plot_myocardial_work(self, filename='', data=None, echop=False)
+aha.plot_myocardial_work(filename='', data=None, echop=False)
 
 ```
 *filename*: name of the file to save figure
