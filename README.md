@@ -12,7 +12,7 @@ increase the readability and enhance the value of the provided medical data. Exa
 (with random, probable values) are provided. The plots can be generated in two versions: as described in the 
 recommendations, and as provided within the EchoPAC software (GE, Horten, Norway).
 
-# Left Ventricle Segmentation Procedure
+## Left Ventricle Segmentation Procedure
 
 When assessing the function of the left ventricle (LV), American Society of Echocardiography and European Association of 
 Cardiovascular Imaging recommends the segmentation of the LV into 16, 17 or 18 elements:
@@ -35,16 +35,16 @@ anteroseptal, apical inferoseptal, apical inferior, apical inferolateral, and ap
 
 ---
 # Screenshots
-## 17 AHA plot of Myocardial Work
+### 17 AHA plot of Myocardial Work
 ![smooth plots](images/17_AHA_MW.png  "17 AHA plot of Myocardial Work")
 
-## 18 AHA plot of Myocardial Work - EchoPAC version
+### 18 AHA plot of Myocardial Work - EchoPAC version
 ![smooth plots](images/18_AHA_Echo_MW.png  "Myocardial Work - Echopac version")
 
-## 18 AHA plot of Segmental Strain
+### 18 AHA plot of Segmental Strain
 ![smooth plots](images/18_AHA_strain.png  "17 AHA plot of Segmental Strain")
 
-## 17 AHA plot of Segmental Strain - EchoPAC version
+### 17 AHA plot of Segmental Strain - EchoPAC version
 ![smooth plots](images/17_AHA_Echo_strain.png  "Segmental Strain - Echopac version")
 
 ---
@@ -52,9 +52,7 @@ anteroseptal, apical inferoseptal, apical inferior, apical inferolateral, and ap
 Two methods creating the most common plots are provided. However, using the basic functions it is possible to generate
 different plots, as long as the provided data structure is consistent.
 
-### class
-
-**Call**
+**Example Call**
 ```python
 # List of segments
 segments_18 = ['Basal Anterior', 'Basal Anteroseptal', 'Basal Inferoseptal',
