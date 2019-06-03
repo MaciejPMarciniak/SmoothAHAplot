@@ -53,7 +53,8 @@ communication within echocardiography and across other imaging modalities.
 
 ---
 # How2use
-Two methods creating the most common plots are provided.
+Two methods creating the most common plots are provided. However, using the basic functions it is possible to generate
+different plots, as long as the provided data structure is consistent.
 
 ### class
 
@@ -114,7 +115,9 @@ aha.plot_myocardial_work(filename='', data=None, echop=False)
 
 ---
 # Credits
-Abstract
+Acknowledgements to Joao Filipe Fernandes and Fifi Loncaric for their invaluable input. 
 
 ---
 # License
+The code is openly available. If this tool has been useful in your research, please reference this site 
+https://github.com/MaciejPMarciniak/smoothAHAplot 
