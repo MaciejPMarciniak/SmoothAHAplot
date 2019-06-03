@@ -37,8 +37,6 @@ myocardial perfusion. These segmentation schemes result in segments with compara
 also related (with some varibility) to the coronary perfusion. The proposed segmentations enable standardized 
 communication within echocardiography and across other imaging modalities.
 
-
-
 ---
 # Screenshots
 ## 17 AHA plot of Myocardial Work

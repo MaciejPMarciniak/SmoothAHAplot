@@ -21,41 +21,68 @@ class SmoothAHAPlot:
     Two helper methods are included, adjusted to plot myocardial work and strain values with proper scales.
     """
 
-    # If a pandas dataframe is provided, it should have the following names:
+    # If pandas Series/dictionary must have following index/keys:
     AHA_17_SEGMENT_NAMES = ['Basal Anterior', 'Basal Anteroseptal', 'Basal Inferoseptal',
                             'Basal Inferior', 'Basal Inferolateral', 'Basal Anterolateral',
                             'Mid Anterior', 'Mid Anteroseptal', 'Mid Inferoseptal',
                             'Mid Inferior', 'Mid Inferolateral', 'Mid Anterolateral',
                             'Apical Anterior', 'Apical Septal', 'Apical Inferior', 'Apical Lateral', 'Apex']
     # or
-    ECHOP_18_SEGMENTS = ['Basal Anterior', 'Basal Anteroseptal', 'Basal Septal',
-                         'Basal Inferior', 'Basal Posterior', 'Basal Lateral',
-                         'Mid Anterior', 'Mid Anteroseptal', 'Mid Septal',
-                         'Mid Inferior', 'Mid Posterior', 'Mid Lateral',
-                         'Apical Anterior', 'Apical Anteroseptal', 'Apical Septal',
-                         'Apical Inferior', 'Apical Posterior', 'Apical Lateral']
+    AHA_18_SEGMENT_NAMES = ['Basal Anterior', 'Basal Anteroseptal', 'Basal Inferoseptal',
+                            'Basal Inferior', 'Basal Inferolateral', 'Basal Anterolateral',
+                            'Mid Anterior', 'Mid Anteroseptal', 'Mid Inferoseptal',
+                            'Mid Inferior', 'Mid Inferolateral', 'Mid Anterolateral',
+                            'Apical Anterior', 'Apical Anteroseptal', 'Apical Inferoseptal',
+                            'Apical Inferior', 'Apical Inferolateral', 'Apical Anterolateral']
 
-    # The actual names of the segments:
+    # The names of the segments:
     AHA_SEGMENT_NAMES = ['Anterior', 'Anteroseptal', 'Inferoseptal',
                          'Inferior', 'Inferolateral', 'Anterolateral']
+
     # EchoPAC version of the names:
     ECHOP_SEGMENT_ABBRV = ['ANT', 'ANT_SEPT', 'SEPT', 'INF', 'POST', 'LAT']
 
-    def __init__(self, data, output_path='', plot_filename='AHA_plot.png', n_segments=17):
+    def __init__(self, segments, output_path='', n_segments=17):
 
-        if data is None:
-            self.data = [0] * n_segments
+        assert n_segments in [17, 18], ('Please provide the correct number of segments for the plot: 17 or 18.'
+                                        'Current n_segments: {}'.format(n_segments))
+        self.n_segments = n_segments
+
+        if segments is None:
+            self.seg_values = [0] * n_segments
             print('No data provided. Please provide segmental values for the plot: SmoothAHAPlot.data = ...')
         else:
-            assert len(data) == n_segments, 'Please provide the proper number of segmental values for the plot. ' \
-                                            'len(data) = {}, n_segments: {}'.format(len(data), n_segments)
-            self.data = data
-        self.n_segments = n_segments
+            assert len(segments) == n_segments, 'Please provide the proper number of segmental values for the plot. ' \
+                                                'len(data) = {}, n_segments: {}'.format(len(segments), n_segments)
+            self.seg_values = self._get_segmental_values(segments)
+
         self.output_path = output_path
-        self.plot_filename = plot_filename
         self.levels = None
         self.fig = None
         self.resolution = (768, 100)
+
+    def _get_segmental_values(self, segments):
+
+        if self.n_segments == 17:
+            seg_list = self.AHA_17_SEGMENT_NAMES
+        else:
+            seg_list = self.AHA_18_SEGMENT_NAMES
+
+        segmental_values = []
+        if isinstance(segments, dict):
+            for seg_name in seg_list:
+                try:
+                    segmental_values.append(segments[seg_name])
+                except KeyError:
+                    exit('Value of segment {} is missing!'.format(seg_name))
+
+        elif isinstance(segments, pd.Series):
+            segments = segments.reindex(seg_list, axis=1)
+            if segments.isnull().values.any():
+                exit('Segmental names are incompatibile:\n{}\n{}'.format(segments.index, seg_list))
+            segmental_values = segments.values
+
+        return segmental_values
 
     def _interpolate_17_aha_values(self, aha_values=None):
         """
@@ -64,10 +91,10 @@ class SmoothAHAPlot:
             The 17 values
         :return:
         """
-        assert len(self.data) == 17, 'Please provide the proper number of segmental values for the 17 AHA plot. ' \
-                                     'len(data) = {}'.format(len(self.data))
+        assert len(self.seg_values) == 17, 'Please provide the proper number of segmental values for the 17 AHA plot. ' \
+                                           'len(data) = {}'.format(len(self.seg_values))
         if aha_values is None:
-            aha_values = self.data
+            aha_values = self.seg_values
 
         res_x = self.resolution[0]
         res_y = self.resolution[1]
@@ -115,10 +142,10 @@ class SmoothAHAPlot:
             The 18 values
         :return:
         """
-        assert len(self.data) == 18, 'Please provide the proper number of segmental values for the 18 AHA plot. ' \
-                                     'len(data) = {}'.format(len(self.data))
+        assert len(self.seg_values) == 18, ('Please provide the proper number of segmental values for the 18 AHA plot. '
+                                           'len(data) = {}'.format(len(self.seg_values)))
         if aha_values is None:
-            aha_values = self.data
+            aha_values = self.seg_values
 
         res_x = self.resolution[0]
         res_y = self.resolution[1]
@@ -184,7 +211,7 @@ class SmoothAHAPlot:
         """
 
         if norm is None:
-            norm = mpl.colors.Normalize(vmin=self.data.min(), vmax=self.data.max())
+            norm = mpl.colors.Normalize(vmin=self.seg_values.min(), vmax=self.seg_values.max())
         elif isinstance(norm, tuple) and len(norm) == 2:
             norm = mpl.colors.Normalize(vmin=norm[0], vmax=norm[1])
         else:
@@ -204,7 +231,7 @@ class SmoothAHAPlot:
             seg_names_pos = np.repeat([0.06], 6)
 
         # -----Basic assumptions on resolution--------------------------------------------------------------------------
-        self.data = np.array(self.data).ravel()
+        self.seg_values = np.array(self.seg_values).ravel()
         theta = np.linspace(0, 2 * np.pi, self.resolution[0])
         if echop:
             theta -= np.pi / 3
@@ -232,20 +259,20 @@ class SmoothAHAPlot:
 
         # -----Linear interpolation-------------------------------------------------------------------------------------
         if self.n_segments == 17:
-            interp_data = self._interpolate_17_aha_values(self.data)
+            interp_data = self._interpolate_17_aha_values(self.seg_values)
         else:
-            interp_data = self._interpolate_18_aha_values(self.data)
+            interp_data = self._interpolate_18_aha_values(self.seg_values)
 
         r = np.linspace(0, 1, interp_data.shape[0])
         # ==============================================================================================================
 
-        # -----Fill segments 1:12---------------------------------------------------------------------------------------
+        # -----Fill segments -------------------------------------------------------------------------------------------
         r0 = np.repeat(r[:, np.newaxis], self.resolution[0], axis=1).T
         theta0 = np.repeat(theta[:, np.newaxis], r0.shape[1], axis=1)
         z = interp_data
         z = z.T
 
-        # Colour
+        # Color the plot
         if smooth_contour and (self.levels is not None):
             cf = ax.contourf(theta0, r0, z, cmap=cmap, levels=self.levels)
             cf.ax.axis('off')
@@ -255,23 +282,23 @@ class SmoothAHAPlot:
         # Annotate
         for i in range(6):
             # Segments 1-6
-            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[73:]), int(self.data[i]), fontsize=20,
+            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[73:]), int(self.seg_values[i]), fontsize=20,
                     ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             # Segments 7-12
-            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[46:73]), int(self.data[i+6]), fontsize=20,
+            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[46:73]), int(self.seg_values[i+6]), fontsize=20,
                     ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
-            # Sides
+            # Segment names
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), r[-1] + seg_names_pos[i], seg_names[i],
                     fontsize=20, ha='center', va='center', rotation=rot[i])
         # Segments 13-16
         for i in range(4):
-            ax.text(np.deg2rad(i * 90) + np.deg2rad(seg_align_13_16[i]), np.mean(r[20:46]), int(self.data[i + 12]),
+            ax.text(np.deg2rad(i * 90) + np.deg2rad(seg_align_13_16[i]), np.mean(r[20:46]), int(self.seg_values[i + 12]),
                     fontsize=20, ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
         # Segment 17
-        ax.text(0, 0, int(self.data[16]), fontsize=20, ha='center', va='center', color='w',
+        ax.text(0, 0, int(self.seg_values[16]), fontsize=20, ha='center', va='center', color='w',
                 path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
         # ==============================================================================================================
 
@@ -316,7 +343,7 @@ class SmoothAHAPlot:
         """
 
         if norm is None:
-            norm = mpl.colors.Normalize(vmin=self.data.min(), vmax=self.data.max())
+            norm = mpl.colors.Normalize(vmin=self.seg_values.min(), vmax=self.seg_values.max())
         elif isinstance(norm, tuple) and len(norm) == 2:
             norm = mpl.colors.Normalize(vmin=norm[0], vmax=norm[1])
         else:
@@ -334,7 +361,7 @@ class SmoothAHAPlot:
             seg_names_pos = np.repeat([0.06], 6)
 
         # -----Basic assumptions on resolution--------------------------------------------------------------------------
-        self.data = np.array(self.data).ravel()
+        self.seg_values = np.array(self.seg_values).ravel()
         theta = np.linspace(0, 2 * np.pi, self.resolution[0])
         if echop:
             theta -= np.pi / 3
@@ -356,9 +383,9 @@ class SmoothAHAPlot:
 
         # -----Linear interpolation-------------------------------------------------------------------------------------
         if self.n_segments == 17:
-            interp_data = self._interpolate_17_aha_values(self.data)
+            interp_data = self._interpolate_17_aha_values(self.seg_values)
         else:
-            interp_data = self._interpolate_18_aha_values(self.data)
+            interp_data = self._interpolate_18_aha_values(self.seg_values)
 
         r = np.linspace(0, 1, interp_data.shape[0])
         # ==============================================================================================================
@@ -373,13 +400,13 @@ class SmoothAHAPlot:
 
         # Annotate
         for i in range(6):
-            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.84, int(self.data[i]), fontsize=20,
+            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.84, int(self.seg_values[i]), fontsize=20,
                     ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
-            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.55, int(self.data[i + 6]), fontsize=20,
+            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.55, int(self.seg_values[i + 6]), fontsize=20,
                     ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
-            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.25, int(self.data[i + 12]), fontsize=20,
+            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.25, int(self.seg_values[i + 12]), fontsize=20,
                     ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), r[-1] + seg_names_pos[i], seg_names[i],
@@ -409,14 +436,19 @@ class SmoothAHAPlot:
 
         return fig
 
-    def plot_myocardial_work(self, filename='', data=None, echop=False):
+    def _plot_setup(self, data):
 
-        if filename != '':
-            self.plot_filename = filename
         if data is not None:
             assert len(data) == self.n_segments, 'Please provide correct number of segmental values for the plot. ' \
                                                  'len(data) = {}, n_segments =  {}'.format(len(data), self.n_segments)
-            self.data = data
+            if not isinstance(data, list):
+                data = self._get_segmental_values(data)
+
+        return data
+
+    def plot_myocardial_work(self, filename='', data=None, echop=False):
+
+        self.seg_values = self._plot_setup(data)
 
         cmap = plt.get_cmap('rainbow')
         norm = (1000, 3000)
@@ -428,16 +460,11 @@ class SmoothAHAPlot:
         else:
             fig = self.bullseye_17_smooth(fig=fig, ax=ax, cmap=cmap, norm=norm, title='Myocardial work index',
                                           units='mmHg%', smooth_contour=False, echop=echop)
-        fig.savefig(os.path.join(self.output_path, self.plot_filename))
+        fig.savefig(os.path.join(self.output_path, filename))
 
     def plot_strain(self, filename='', data=None, echop=False):
 
-        if filename != '':
-            self.plot_filename = filename
-        if data is not None:
-            assert len(data) == self.n_segments, 'Please provide correct number of segmental values for the plot. ' \
-                                                 'len(data) = {}, n_segments =  {}'.format(len(data), self.n_segments)
-            self.data = data
+        self.seg_values = self._plot_setup(data)
 
         self.levels = MaxNLocator(nbins=12).tick_values(-30, 30)
         cmap = plt.get_cmap('seismic_r')
@@ -449,36 +476,4 @@ class SmoothAHAPlot:
         else:
             fig = self.bullseye_17_smooth(fig=fig, ax=ax, cmap=cmap, norm=norm, title='Longitudinal strain', units='%',
                                           smooth_contour=True, echop=echop)
-        fig.savefig(os.path.join(self.output_path, self.plot_filename))
-
-    def plot_all(self, df_path='', echop=True):
-
-        df_hyp = pd.read_excel(df_path, index_col=0)
-
-        if self.n_segments == 17:
-            df_hyp = df_hyp.reindex(self.AHA_17_SEGMENT_NAMES, axis=1)
-        else:
-            df_hyp = df_hyp.reindex(self.ECHOP_18_SEGMENTS, axis=1)
-
-        aha.plot_strain('htn_strain_1_aha.png', data=df_hyp.loc['mean_strain_avc_1'].values, echop=echop)
-        aha.plot_strain('htn_strain_2_aha.png', data=df_hyp.loc['mean_strain_avc_2'].values, echop=echop)
-        aha.plot_myocardial_work('htn_MW_1_aha.png', data=df_hyp.loc['mean_MW_1'].values, echop=echop)
-        aha.plot_myocardial_work('htn_MW_2_aha.png', data=df_hyp.loc['mean_MW_2'].values, echop=echop)
-        # aha.plot_strain('strain_all.png', data=df_hyp.loc['mean_strain_avc'].values, echop=echop)
-        # aha.plot_myocardial_work('MW_all.png', data=df_hyp.loc['mean_MW'].values, echop=echop)
-
-
-if __name__ == '__main__':
-    exp_strain_data = [-13, -14, -16, -19, -19, -18, -19, -23, -1, -21, -20, -20, -23, 1, -28, -25, -26, 27]
-    exp_mw_data = [1926, 1525, 1673, 2048, 2325, 2200, 2197, 2014, 1982, 2199, 2431, 2409, 2554, 2961, 2658, 2729, 2833]
-
-    n_seg = 18
-    exp_strain_data = exp_strain_data[:n_seg]
-    aha = SmoothAHAPlot(exp_strain_data, output_path='/home/mat/Python/data/parsing_xml/22 random/output',
-                        plot_filename='17_AHA_strain.png', n_segments=n_seg)
-    aha.plot_all('/home/mat/Python/data/parsing_xml/22 random/output/population_18_AHA.xlsx', echop=False)
-
-    # aha.plot_strain()
-    # aha.plot_myocardial_work('17_AHA_MW.png', data=exp_mw_data)
-    # aha.plot_strain('17_AHA_Echo_strain.png', data=exp_strain_data, echop=True)
-    # aha.plot_myocardial_work('17_AHA_Echo_MW.png', data=exp_mw_data, echop=True)
+        fig.savefig(os.path.join(self.output_path, filename))
