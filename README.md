@@ -58,18 +58,60 @@ communication within echocardiography and across other imaging modalities.
 
 **Call**
 ```python
+from ahasmoothplot import SmoothAHAPlot
+
+# List of segments
+segments_18 = ['Basal Anterior', 'Basal Anteroseptal', 'Basal Inferoseptal',
+               'Basal Inferior', 'Basal Inferolateral', 'Basal Anterolateral',
+               'Mid Anterior', 'Mid Anteroseptal', 'Mid Inferoseptal',
+               'Mid Inferior', 'Mid Inferolateral', 'Mid Anterolateral',
+               'Apical Anterior', 'Apical Anteroseptal', 'Apical Inferoseptal',
+               'Apical Inferior', 'Apical Inferolateral', 'Apical Anterolateral']
+# Segmental values
+exp_strain_data = [-13, -14, -16, -19, -19, -18, -19, -23, -19, -21, -20, -20, -24, -27, -28, -25, -26, -22]
+# Number of segments to plot
+n_seg = len(exp_strain_data)
+
+strain_dict = {k: v for (k, v) in zip(segments_18, exp_strain_data)}
+
+# Create object
+aha = SmoothAHAPlot(strain_dict, output_path='./images', n_segments=n_seg)
+# Plot strain
+aha.plot_strain('18_AHA_strain.png', data=strain_dict)
 ```
 
 ---
 **Input**
 
----
-**Output** 
+*segments*: dictionary/pandas Series with names of the segments as keys/index and corresponding segmental values
+
+*output_path*: folder where the plots will be saved
+
+*n_segments*: number of segments (must be 17 or 18 and correspond to length of the *segments*)
 
 ---
 **Methods**
+```python
+plot_strain(self, filename='', data=None, echop=False)
 
+```
+*filename*: name of the file to save figure
 
+*data*: dictionary/pandas Series with names of the segments as keys/index and corresponding segmental values
+
+*echop*: whether to use the EchoPAC format of the plot
+
+```python
+plot_myocardial_work(self, filename='', data=None, echop=False)
+
+```
+*filename*: name of the file to save figure
+
+*data*: dictionary/pandas Series with names of the segments as keys/index and corresponding segmental values
+
+*echop*: whether to use the EchoPAC format of the plot
+
+---
 # Credits
 Abstract
 
