@@ -1,4 +1,19 @@
 # Smooth 17 and 18 segment AHA bullseye plots
+The muscle and cavity of the left ventricle can be divided into a variable number of segments. Based on autopsy data 
+the AHA recommends a division into 17 or 18 segments for the regional analysis of left ventricular function or 
+myocardial perfusion. These segmentation schemes result in segments with comparable myocardial mass, which are
+also related (with some varibility) to the coronary perfusion. The proposed segmentations enable standardized 
+communication within echocardiography and across other imaging modalities.
+
+Using novel techonlogies and software, it is now possible to calculate the segmental values of the relevant parameters, 
+such as strain or myocardial work. In this project, the segmental values are visualized using the 17 and 18 segment 
+bullseye plots, to provide insights into the function of the LV in a palpable way. Proposed plots are smoothed, to 
+increase the readability and enhance the value of the provided medical data. Examples of strain and myocardial work 
+(with random, probable values) are provided. The plots can be generated in two versions: as described in the 
+recommendations, and as provided within the EchoPAC software (GE, Horten, Norway).
+
+# Left Ventricle Segmentation Procedure
+
 When assessing the function of the left ventricle (LV), American Society of Echocardiography and European Association of 
 Cardiovascular Imaging recommends the segmentation of the LV into 16, 17 or 18 elements:
 
@@ -17,22 +32,6 @@ apical anterior, apical septal, apical inferior, and apical lateral.
  This segment is called the apex.
 * In case of 18 segments, the apical part is also divided into six 60° segments called apical anterior, apical 
 anteroseptal, apical inferoseptal, apical inferior, apical inferolateral, and apical anterolateral.
-
-# Motivation
-### Left Ventricle Segmentation Procedure
-
-The muscle and cavity of the left ventricle can be divided into a variable number of segments. Based on autopsy data 
-the AHA recommends a division into 17 or 18 segments for the regional analysis of left ventricular function or 
-myocardial perfusion. These segmentation schemes result in segments with comparable myocardial mass, which are
-also related (with some varibility) to the coronary perfusion. The proposed segmentations enable standardized 
-communication within echocardiography and across other imaging modalities.
-
-Using novel techonlogies and software, it is now possible to calculate the segmental values of the relevant parameters, 
-such as strain or myocardial work. In this project, the segmental values are visualized using the 17 and 18 segment 
-bullseye plots, to provide insights into the function of the LV in a palpable way. Proposed plots are smoothed, to 
-increase the readability and enhance the value of the provided medical data. Examples of strain and myocardial work 
-(with random, probable values) are provided. The plots can be generated in two versions: as described in the 
-recommendations, and as provided within the EchoPAC software (GE, Horten, Norway).
 
 ---
 # Screenshots
