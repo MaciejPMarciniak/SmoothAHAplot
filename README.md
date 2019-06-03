@@ -40,16 +40,16 @@ communication within echocardiography and across other imaging modalities.
 ---
 # Screenshots
 ## 17 AHA plot of Myocardial Work
-![smooth plots](images/17_AHA_MW.png "17 AHA plot of Myocardial Work")
+![smooth plots](images/17_AHA_MW.png  "17 AHA plot of Myocardial Work")
 
 ## 18 AHA plot of Myocardial Work - EchoPAC version
-![smooth plots](images/18_AHA_Echo_MW.png "Myocardial Work - Echopac version")
+![smooth plots](images/18_AHA_Echo_MW.png  "Myocardial Work - Echopac version")
 
 ## 18 AHA plot of Segmental Strain
-![smooth plots](images/18_AHA_strain.png "17 AHA plot of Segmental Strain")
+![smooth plots](images/18_AHA_strain.png  "17 AHA plot of Segmental Strain")
 
 ## 17 AHA plot of Segmental Strain - EchoPAC version
-![smooth plots](images/17_AHA_Echo_strain.png "Segmental Strain - Echopac version")
+![smooth plots](images/17_AHA_Echo_strain.png  "Segmental Strain - Echopac version")
 
 ---
 # How2use
