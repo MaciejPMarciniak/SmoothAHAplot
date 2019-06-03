@@ -304,7 +304,7 @@ class SmoothAHAPlot:
 
         # -----Add plot featres-----------------------------------------------------------------------------------------
         # Create the axis for the colorbars
-        bar = fig.add_axes([0.12, 0.15, 0.2, 0.05])
+        bar = fig.add_axes([0.1, 0.1, 0.2, 0.05])
         cb1 = mpl.colorbar.ColorbarBase(bar, cmap=cmap, norm=norm, orientation='horizontal')
         cb1.set_label(units, size=16)
         cb1.ax.tick_params(labelsize=14, which='major')

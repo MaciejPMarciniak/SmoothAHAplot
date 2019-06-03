@@ -96,7 +96,7 @@ aha.plot_strain('18_AHA_strain.png', data=strain_dict)
 aha.plot_strain(filename='', data=None, echop=False)
 
 ```
-*filename*: name of the file to save figure
+*filename*: saved figure file name
 
 *data*: dictionary/pandas Series with names of the segments as keys/index and corresponding segmental values
 
@@ -106,7 +106,7 @@ aha.plot_strain(filename='', data=None, echop=False)
 aha.plot_myocardial_work(filename='', data=None, echop=False)
 
 ```
-*filename*: name of the file to save figure
+*filename*: saved figure file name
 
 *data*: dictionary/pandas Series with names of the segments as keys/index and corresponding segmental values
 
