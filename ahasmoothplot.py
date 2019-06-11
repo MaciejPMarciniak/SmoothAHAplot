@@ -42,6 +42,8 @@ class SmoothAHAPlot:
     # EchoPAC version of the names:
     ECHOP_SEGMENT_ABBRV = ['ANT', 'ANT_SEPT', 'SEPT', 'INF', 'POST', 'LAT']
 
+    COLORS = ['cyan', 'yellow', 'red', 'blue', 'magenta', 'green']
+
     def __init__(self, segments, output_path='', n_segments=17):
 
         assert n_segments in [17, 18], ('Please provide the correct number of segments for the plot: 17 or 18.'
@@ -282,16 +284,17 @@ class SmoothAHAPlot:
         # Annotate
         for i in range(6):
             # Segments 1-6
-            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[73:]), int(self.seg_values[i]), fontsize=20,
-                    ha='center', va='center', color='w',
+            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[73:]), int(self.seg_values[i]),
+                    fontsize=20, ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             # Segments 7-12
-            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[46:73]), int(self.seg_values[i+6]), fontsize=20,
-                    ha='center', va='center', color='w',
+            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[46:73]), int(self.seg_values[i+6]),
+                    fontsize=20, ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             # Segment names
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), r[-1] + seg_names_pos[i], seg_names[i],
-                    fontsize=20, ha='center', va='center', rotation=rot[i])
+                    fontsize=20, ha='center', va='center', rotation=rot[i],
+                    color=self.COLORS[i], path_effects=[pef.Stroke(linewidth=1, foreground='k'), pef.Normal()])
         # Segments 13-16
         for i in range(4):
             ax.text(np.deg2rad(i * 90) + np.deg2rad(seg_align_13_16[i]), np.mean(r[20:46]), int(self.seg_values[i + 12]),
@@ -304,7 +307,7 @@ class SmoothAHAPlot:
 
         # -----Add plot featres-----------------------------------------------------------------------------------------
         # Create the axis for the colorbars
-        bar = fig.add_axes([0.1, 0.1, 0.2, 0.05])
+        bar = fig.add_axes([0.05, 0.1, 0.2, 0.05])
         cb1 = mpl.colorbar.ColorbarBase(bar, cmap=cmap, norm=norm, orientation='horizontal')
         cb1.set_label(units, size=16)
         cb1.ax.tick_params(labelsize=14, which='major')
@@ -409,9 +412,10 @@ class SmoothAHAPlot:
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.25, int(self.seg_values[i + 12]), fontsize=20,
                     ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
+            # Segment names
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), r[-1] + seg_names_pos[i], seg_names[i],
-                    fontsize=20, ha='center', va='center', rotation=rot[i])
-
+                    fontsize=20, ha='center',  va='center', rotation=rot[i],
+                    color=self.COLORS[i], path_effects=[pef.Stroke(linewidth=1, foreground='k'), pef.Normal()])
         # Colour
         if smooth_contour and (self.levels is not None):
             cf = ax.contourf(theta0, r0, z, cmap=cmap, levels=self.levels)
@@ -422,7 +426,7 @@ class SmoothAHAPlot:
 
         # -----Add plot featres-----------------------------------------------------------------------------------------
         # Create the axis for the colorbars
-        bar = fig.add_axes([0.1, 0.1, 0.2, 0.05])
+        bar = fig.add_axes([0.05, 0.1, 0.2, 0.05])
         cb1 = mpl.colorbar.ColorbarBase(bar, cmap=cmap, norm=norm, orientation='horizontal')
         cb1.set_label(units, size=16)
         cb1.ax.tick_params(labelsize=14, which='major')
