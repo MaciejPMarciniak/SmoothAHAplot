@@ -293,7 +293,7 @@ class SmoothAHAPlot:
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             # Segment names
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), r[-1] + seg_names_pos[i], seg_names[i],
-                    fontsize=20, ha='center', va='center', rotation=rot[i],
+                    fontsize=20, ha='center', va='center', rotation=rot[i], weight='bold',
                     color=self.COLORS[i], path_effects=[pef.Stroke(linewidth=1, foreground='k'), pef.Normal()])
         # Segments 13-16
         for i in range(4):

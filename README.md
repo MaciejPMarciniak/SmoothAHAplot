@@ -109,7 +109,11 @@ aha.plot_myocardial_work(filename='', data=None, echop=False)
 
 ---
 # Credits
-Acknowledgements to Joao Filipe Fernandes and Fifi Loncaric for their invaluable input. 
+EuroEcho 2019 Abstract:
+*Myocardial work in hypertension and mitral regurgitation- insights from non-invasive assessment of left ventricular 
+pressure-strain relations*
+
+Acknowledgements to Joao Filipe Fernandes and Filip Loncaric for their invaluable input. 
 
 ---
 # License
