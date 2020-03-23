@@ -44,18 +44,18 @@ class SmoothAHAPlot:
 
     COLORS = ['cyan', 'yellow', 'red', 'blue', 'magenta', 'green']
 
-    def __init__(self, segments, output_path='', n_segments=17):
+    def __init__(self, segments, output_path='', n_segments=None):
 
-        assert n_segments in [17, 18], ('Please provide the correct number of segments for the plot: 17 or 18.'
-                                        'Current n_segments: {}'.format(n_segments))
+        assert n_segments in [17, 18], ('Please provide the correct number of points for the plot: 17, 18 or 65.'
+                                          'Current n_points: {}'.format(n_segments))
         self.n_segments = n_segments
 
         if segments is None:
             self.seg_values = [0] * n_segments
             print('No data provided. Please provide segmental values for the plot: SmoothAHAPlot.data = ...')
         else:
-            assert len(segments) == n_segments, 'Please provide the proper number of segmental values for the plot. ' \
-                                                'len(data) = {}, n_segments: {}'.format(len(segments), n_segments)
+            assert len(segments) in [n_segments, 65], 'Please provide the proper number of segmental values for the' \
+                                                'plot. len(data) = {}, n_segments: {}'.format(len(segments), n_segments)
             self.seg_values = self._get_segmental_values(segments)
 
         self.output_path = output_path
@@ -65,9 +65,12 @@ class SmoothAHAPlot:
 
     def _get_segmental_values(self, segments):
 
+        if len(segments) == 65:
+            return segments
+
         if self.n_segments == 17:
             seg_list = self.AHA_17_SEGMENT_NAMES
-        else:
+        elif self.n_segments == 18:
             seg_list = self.AHA_18_SEGMENT_NAMES
 
         segmental_values = []
@@ -85,6 +88,11 @@ class SmoothAHAPlot:
             segmental_values = segments.values
 
         return segmental_values
+
+    def _interpolate_65_to_17_values(self):
+
+        pass
+
 
     def _interpolate_17_aha_values(self, aha_values=None):
         """
@@ -145,7 +153,7 @@ class SmoothAHAPlot:
         :return:
         """
         assert len(self.seg_values) == 18, ('Please provide the proper number of segmental values for the 18 AHA plot. '
-                                           'len(data) = {}'.format(len(self.seg_values)))
+                                            'len(data) = {}'.format(len(self.seg_values)))
         if aha_values is None:
             aha_values = self.seg_values
 
@@ -183,6 +191,48 @@ class SmoothAHAPlot:
         full_map = np.roll(full_map, int(res_x/4), axis=1)
         full_map = np.flip(full_map, 0)
         y_0 = [0, 0.28, 0.5, 0.8, 1]
+        f = interp1d(y_0, full_map, axis=0)
+        full_map_interp = f(np.linspace(0, 1, res_y))
+
+        return full_map_interp
+
+    def _interpolate_65_values(self, aha_values=None):
+        """
+        Funtion to interpolate the initial 65 values, to achieve smooth transition among segments.
+        :param aha_values: list, tuple, np.array
+            The 65 values
+        :return:
+        """
+        assert len(self.seg_values) == 65, 'Please provide 65 values for the AHA plot. Number of points provided: ' \
+                                           'len(data) = {}'.format(len(self.seg_values))
+        if aha_values is None:
+            aha_values = self.seg_values
+
+        res_x = self.resolution[0]
+        res_y = self.resolution[1]
+
+        # Extract values
+        aha_values = aha_values[::-1]
+        spiral_base_to_apex = np.array(aha_values[:-1]).reshape((8, 8))
+
+        # Set up the interpolation matrices
+        spiral_interp = np.zeros((8, res_x))
+        apex_interp = np.repeat(aha_values[-1], res_x)
+
+        # Interpolate around the radial positions
+        for slice_ in range(8):
+            for i in range(8):
+                spiral_interp[slice_, int(res_x / 8) * i:int(res_x / 8 * (i + 1))] = \
+                 np.linspace(spiral_base_to_apex[slice_, i], spiral_base_to_apex[slice_, (i + 1) % 8], int(res_x / 8))
+
+        # Put it all together
+        full_map = np.append(spiral_interp, apex_interp.reshape(1, -1), axis=0)
+        # full_map = np.roll(full_map, int(res_x/3), axis=1)
+        full_map = np.flip(full_map, 0)
+
+        print(full_map.shape)
+        y_0 = [0, 0.04, 0.12, 0.22, 0.34, 0.5, 0.66, 0.83, 1]
+
         f = interp1d(y_0, full_map, axis=0)
         full_map_interp = f(np.linspace(0, 1, res_y))
 
@@ -260,10 +310,15 @@ class SmoothAHAPlot:
         # ==============================================================================================================
 
         # -----Linear interpolation-------------------------------------------------------------------------------------
-        if self.n_segments == 17:
+        if len(self.seg_values) == 17:
             interp_data = self._interpolate_17_aha_values(self.seg_values)
-        else:
+        elif len(self.seg_values) == 18:
             interp_data = self._interpolate_18_aha_values(self.seg_values)
+        elif len(self.seg_values) == 65:
+            interp_data = self._interpolate_65_values(self.seg_values)
+        else:
+            exit('Wrong number of segments provided: {}'.format(len(self.seg_values)))
+            return -1
 
         r = np.linspace(0, 1, interp_data.shape[0])
         # ==============================================================================================================
@@ -281,11 +336,15 @@ class SmoothAHAPlot:
         else:
             ax.pcolormesh(theta0, r0, z, cmap=cmap, norm=norm)
 
+        if len(self.seg_values) == 65:
+            self._interpolate_65_to_17_values()
+
         # Annotate
         for i in range(6):
             # Segments 1-6
-            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[73:]), int(self.seg_values[i]),
-                    fontsize=20, ha='center', va='center', color='w',
+            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[73:]),  # position (circumferential, norm)
+                    int(self.seg_values[i]),  # value
+                    fontsize=20, ha='center', va='center', color='w',  # font options
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             # Segments 7-12
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[46:73]), int(self.seg_values[i+6]),
@@ -385,10 +444,15 @@ class SmoothAHAPlot:
         # ==============================================================================================================
 
         # -----Linear interpolation-------------------------------------------------------------------------------------
-        if self.n_segments == 17:
+        if len(self.seg_values) == 17:
             interp_data = self._interpolate_17_aha_values(self.seg_values)
-        else:
+        elif len(self.seg_values) == 18:
             interp_data = self._interpolate_18_aha_values(self.seg_values)
+        elif len(self.seg_values) == 65:
+            interp_data = self._interpolate_65_values(self.seg_values)
+        else:
+            exit('Wrong number of segments provided: {}'.format(len(self.seg_values)))
+            return -1
 
         r = np.linspace(0, 1, interp_data.shape[0])
         # ==============================================================================================================
@@ -480,4 +544,20 @@ class SmoothAHAPlot:
         else:
             fig = self.bullseye_17_smooth(fig=fig, ax=ax, cmap=cmap, norm=norm, title='Longitudinal strain', units='%',
                                           smooth_contour=True, echop=echop)
+        fig.savefig(os.path.join(self.output_path, filename))
+
+    def plot_wall_thickness(self, filename='', data=None, echop=False):
+
+        # self.seg_values = self._get_segmental_values(data)
+
+        cmap = plt.get_cmap('seismic')
+        norm = (3, 10)
+        fig, ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=1,
+                               subplot_kw=dict(projection='polar'))
+        if self.n_segments == 18:
+            fig = self.bullseye_18_smooth(fig=fig, ax=ax, cmap=cmap, norm=norm, title='Wall thickness',
+                                          units='mm', smooth_contour=False, echop=echop)
+        else:
+            fig = self.bullseye_17_smooth(fig=fig, ax=ax, cmap=cmap, norm=norm, title='Wall thickness',
+                                          units='mm', smooth_contour=False, echop=echop)
         fig.savefig(os.path.join(self.output_path, filename))
