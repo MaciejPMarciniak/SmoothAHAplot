@@ -142,6 +142,14 @@ def show_wall_thickness_plot(show_x, show_y, show_z, show_delay=False):
     plt.show()
 
 
+def wt_difference(exnode_1, exnode_2):
+    wt1 = np.array(calc_wall_thickness(exnode_1))
+    wt2 = np.array(calc_wall_thickness(exnode_2))
+    wt_diff = list(wt1 - wt2)
+
+    return wt_diff
+
+
 if __name__ == '__main__':
     test_exnode = r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\ExFiles\MeanEigen1Scale97.exnode'
     wt = calc_wall_thickness(test_exnode)

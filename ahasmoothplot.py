@@ -141,10 +141,6 @@ class SmoothAHAPlot:
         basal = 0.4 * ds_circ['slice_1'] + 0.4 * ds_circ['slice_2'] + 0.2 * ds_circ['slice_3']
         mid = 0.25 * ds_circ['slice_3'] + 0.5 * ds_circ['slice_4'] + 0.25 * ds_circ['slice_5']
         apical = 0.5 * ds_circ['slice_6'] + 0.5 * ds_circ['slice_7']
-        print(ds_circ['slice_6'])
-        print(ds_circ['slice_7'])
-        print(ds_circ['slice_8'])
-        print(apex)
         apex = np.mean((ds_circ['slice_8'], apex))
 
         aha_17 = list()
@@ -305,7 +301,6 @@ class SmoothAHAPlot:
         # full_map = np.roll(full_map, int(res_x/3), axis=1)
         full_map = np.flip(full_map, 0)
 
-        print(full_map.shape)
         y_0 = [0, 0.1, 0.2, 0.3, 0.4, 0.55, 0.7, 0.85, 1]
 
         f = interp1d(y_0, full_map, axis=0)
@@ -422,12 +417,16 @@ class SmoothAHAPlot:
         for i in range(6):
             # Segments 1-6
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[73:]),  # position (circumferential, norm)
-                    np.round(self.seg_values[i], 1) if float_values else int(self.seg_values[i]),  # values
+                    0 if np.abs(np.round(self.seg_values[i], 1)) < 0.1 else  # condition to not allow 'negative 0'
+                    np.round(self.seg_values[i], 1) if float_values else
+                    int(self.seg_values[i]), # values
                     fontsize=20, ha='center', va='center', color='w',  # font options
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             # Segments 7-12
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[46:73]),
-                    np.round(self.seg_values[i+6], 1) if float_values else int(self.seg_values[i+6]),  # values
+                    0 if np.abs(np.round(self.seg_values[i+6], 1)) < 0.1 else  # condition to not allow 'negative 0'
+                    np.round(self.seg_values[i+6], 1) if float_values else
+                    int(self.seg_values[i+6]),  # values
                     fontsize=20, ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             # Segment names
@@ -438,12 +437,16 @@ class SmoothAHAPlot:
         # Segments 13-16
         for i in range(4):
             ax.text(np.deg2rad(i * 90) + np.deg2rad(seg_align_13_16[i]), np.mean(r[20:46]),
-                    np.round(self.seg_values[i + 12], 1) if float_values else int(self.seg_values[i + 12]),  # values
+                    0 if np.abs(np.round(self.seg_values[i + 12], 1)) < 0.1 else  # condition to not allow 'negative 0'
+                    np.round(self.seg_values[i + 12], 1) if float_values else
+                    int(self.seg_values[i + 12]),  # values
                     fontsize=20, ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
         # Segment 17
         ax.text(0, 0,
-                np.round(self.seg_values[16], 1) if float_values else int(self.seg_values[16]),  # value
+                0 if np.abs(np.round(self.seg_values[16], 1)) < 0.1 else
+                np.round(self.seg_values[16], 1) if float_values else
+                int(self.seg_values[16]),  # value
                 fontsize=20, ha='center', va='center', color='w',
                 path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
         # ==============================================================================================================
@@ -526,28 +529,6 @@ class SmoothAHAPlot:
         for i in range(6):
             theta_i = np.deg2rad(i * 60)
             ax.plot([theta_i, theta_i], [0, 1], '-k', lw=linewidth)
-
-        # testing
-        # r = np.linspace(0.2, 1, 4)
-        # linewidth = 2
-        # # Create the radial bounds
-        # for i in range(r.shape[0]):
-        #     ax.plot(theta, np.repeat(r[i], theta.shape), '--r', lw=linewidth)
-        #
-        # # Create the bounds for the segments 1-12
-        # for i in range(6):
-        #     theta_i = np.deg2rad(i * 60)
-        #     ax.plot([theta_i, theta_i], [r[1], 1], '--y', lw=linewidth)
-        #
-        # # Create the bounds for the segments 13-16
-        # for i in range(4):
-        #     theta_i = np.deg2rad(i * 90 - 45)
-        #     if echop:
-        #         theta_i += np.pi / 4
-        #     ax.plot([theta_i, theta_i], [r[0], r[1]], '--g', lw=linewidth)
-        # plt.show()
-        # exit()
-        # END testing
         # ==============================================================================================================
 
         # -----Linear interpolation-------------------------------------------------------------------------------------
@@ -580,14 +561,18 @@ class SmoothAHAPlot:
         # Annotate
         for i in range(6):
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.84,
-                    np.round(self.seg_values[i], 1) if float_values else int(self.seg_values[i]),
+                    0 if np.abs(np.round(self.seg_values[i], 1)) < 0.1 else # condition to not allow 'negative 0'
+                    np.round(self.seg_values[i], 1) if float_values else
+                    int(self.seg_values[i]),
                     fontsize=20, ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.55,
+                    0 if np.abs(np.round(self.seg_values[i+6], 1)) < 0.1 else  # condition to not allow 'negative 0'
                     np.round(self.seg_values[i+6], 1) if float_values else int(self.seg_values[i + 6]),
                     fontsize=20, ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.25,
+                    0 if np.abs(np.round(self.seg_values[i+12], 1)) < 0.1 else  # condition to not allow 'negative 0'
                     np.round(self.seg_values[i+12], 1) if float_values else int(self.seg_values[i + 12]),
                     fontsize=20, ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
@@ -664,10 +649,28 @@ class SmoothAHAPlot:
 
     def plot_wall_thickness(self, filename='', data=None, echop=False):
 
+        if data is not None:
+            self.seg_values = data
+
         cmap = plt.get_cmap('RdYlBu_r')
         norm = (4, 10)
-        fig, ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=1,
-                               subplot_kw=dict(projection='polar'))
+        fig, ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=1, subplot_kw=dict(projection='polar'))
+        if self.n_segments == 18:
+            fig = self.bullseye_18_smooth(fig=fig, ax=ax, cmap=cmap, norm=norm, title='Wall thickness',
+                                          units='mm', smooth_contour=False, echop=echop)
+        else:
+            fig = self.bullseye_17_smooth(fig=fig, ax=ax, cmap=cmap, norm=norm, title='Wall thickness',
+                                          units='mm', smooth_contour=False, echop=echop)
+        fig.savefig(os.path.join(self.output_path, filename))
+
+    def plot_wt_difference(self, filename='', data=None, echop=False):
+
+        if data is not None:
+            self.seg_values = data
+
+        cmap = plt.get_cmap('coolwarm')
+        norm = (-0.5, 0.5)
+        fig, ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=1, subplot_kw=dict(projection='polar'))
         if self.n_segments == 18:
             fig = self.bullseye_18_smooth(fig=fig, ax=ax, cmap=cmap, norm=norm, title='Wall thickness',
                                           units='mm', smooth_contour=False, echop=echop)
@@ -678,10 +681,16 @@ class SmoothAHAPlot:
 
 
 if __name__ == '__main__':
-    test_exnode = r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\ExFiles\MeanEigen1Scalen97.exnode'
-    wt = calc_wall_thickness(test_exnode)
-    plot_wt = SmoothAHAPlot(wt, r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\ExFiles', n_segments=17)
-    plot_wt.plot_wall_thickness('WT_test2.png')
-    plot_wt.seg_values = wt
-    plot_wt.n_segments = 18
-    plot_wt.plot_wall_thickness('WT_test18.png')
+    # for group in range(1, 9):
+    #     test_exnode = r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\ExFiles\MeanGroup' +\
+    #                   str(group)+'_SGenRLVL_s4_c3.exnode'
+    #     wt = calc_wall_thickness(test_exnode)
+    #     plot_wt = SmoothAHAPlot(wt, r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\Thicknesses', n_segments=17)
+    #     plot_wt.plot_wall_thickness('WT_Group_{}.png'.format(group))
+    group_a = 3
+    group_b = 7
+    exnode1 = r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\ExFiles\MeanGroup{}_SGenRLVL_s4_c3.exnode'.format(group_a)
+    exnode5 = r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\ExFiles\MeanGroup{}_SGenRLVL_s4_c3.exnode'.format(group_b)
+    wt_diff = wt_difference(exnode1, exnode5)
+    plot_wt = SmoothAHAPlot(wt_diff, r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\Thicknesses', n_segments=17)
+    plot_wt.plot_wt_difference('WT_differences_{}_{}.png'.format(group_a, group_b))
