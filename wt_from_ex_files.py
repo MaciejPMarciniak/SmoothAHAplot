@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from ahasmoothplot import SmoothAHAPlot
 
+
 def parse_exnode(exnode_file):
     """Extract node cartesian coordinates from a Mesh.EXNODE file and return Dict.
     Loads a mesh from an Mesh.EXNODE file, calculates the thicknesses and
@@ -127,7 +128,6 @@ def show_wall_thickness_plot(show_x, show_y, show_z, show_delay=False):
         else:
             _color = 'r'
 
-
         ax.plot3D(show_x[i], show_y[i], show_z[i], _color)
 
         if show_delay:
@@ -143,7 +143,7 @@ def show_wall_thickness_plot(show_x, show_y, show_z, show_delay=False):
 
 
 if __name__ == '__main__':
-    test_exnode = r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\ExFiles\MeanEigen1Scalen97.exnode'
+    test_exnode = r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\ExFiles\MeanEigen1Scale97.exnode'
     wt = calc_wall_thickness(test_exnode)
     plot_wt = SmoothAHAPlot(wt, r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\ExFiles', n_segments=17)
     plot_wt.plot_wall_thickness('WT_test2.png')

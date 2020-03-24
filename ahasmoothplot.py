@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patheffects as pef
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
+from wt_from_ex_files import *
 
 
 class SmoothAHAPlot:
@@ -89,10 +90,84 @@ class SmoothAHAPlot:
 
         return segmental_values
 
-    def _interpolate_65_to_17_values(self):
+    @staticmethod
+    def _rotate_downsampled(_downsampled):
+        rotate_ds = _downsampled[1:]
+        rotate_ds.append(_downsampled[0])
+        return np.array(rotate_ds)
 
-        pass
+    def _downsample_8_to_6(self, values):
 
+        def angular_value(val1, val2):
+            return (3*val1 + 5*val2) / 8
+
+        def vertical_value(val1, val2, val3):
+            return (val1 + 6*val2 + val3) / 8
+
+        downsampled = list()
+        downsampled.append(angular_value(*values[:2]))
+        downsampled.append(vertical_value(*values[1:4]))
+        downsampled.append(angular_value(values[4], values[3]))
+        downsampled.append(angular_value(*values[4:6]))
+        downsampled.append(vertical_value(*values[5:]))
+        downsampled.append(angular_value(values[0], values[7]))
+        return self._rotate_downsampled(downsampled)
+
+    def _downsample_8_to_4(self, values):
+
+        def average_value(val1, val2, val3):
+            return (val1 + 2*val2 + val3) / 4
+
+        downsampled = list()
+        downsampled.append(average_value(values[-1], values[0], values[1]))
+        downsampled.append(average_value(*values[1:4]))
+        downsampled.append(average_value(*values[3:6]))
+        downsampled.append(average_value(*values[5:]))
+        return self._rotate_downsampled(downsampled)
+
+    def _downsample_65_to_17_values(self):
+
+        apex = self.seg_values[0]
+        spiral_basal_to_apex = self.seg_values[:0:-1]
+
+        ds_circ = dict()
+        for _slice in range(5):
+            ds_circ['slice_'+str(_slice+1)] = self._downsample_8_to_6(spiral_basal_to_apex[8*_slice:8*(_slice+1)])
+        for _slice in range(5, 7):
+            ds_circ['slice_'+str(_slice+1)] = self._downsample_8_to_4(spiral_basal_to_apex[8*_slice:8*(_slice+1)])
+        for _slice in range(7, 8):
+            ds_circ['slice_' + str(_slice + 1)] = np.mean([spiral_basal_to_apex[8*_slice:8*(_slice+1)]])
+
+        basal = 0.4 * ds_circ['slice_1'] + 0.4 * ds_circ['slice_2'] + 0.2 * ds_circ['slice_3']
+        mid = 0.25 * ds_circ['slice_3'] + 0.5 * ds_circ['slice_4'] + 0.25 * ds_circ['slice_5']
+        apical = 0.5 * ds_circ['slice_6'] + 0.5 * ds_circ['slice_7']
+        print(ds_circ['slice_6'])
+        print(ds_circ['slice_7'])
+        print(ds_circ['slice_8'])
+        print(apex)
+        apex = np.mean((ds_circ['slice_8'], apex))
+
+        aha_17 = list()
+        aha_17.extend([*list(basal), *list(mid), *list(apical), apex])
+
+        return aha_17
+
+    def _downsample_65_to_18_values(self):
+
+        apex = self.seg_values[0]
+        spiral_basal_to_apex = self.seg_values[:0:-1]
+
+        ds_circ = dict()
+        for _slice in range(8):
+            ds_circ['slice_'+str(_slice+1)] = self._downsample_8_to_6(spiral_basal_to_apex[8*_slice:8*(_slice+1)])
+        basal = 0.4 * ds_circ['slice_1'] + 0.4 * ds_circ['slice_2'] + 0.2 * ds_circ['slice_3']
+        mid = 0.2 * ds_circ['slice_3'] + 0.4 * ds_circ['slice_4'] + 0.3 * ds_circ['slice_5'] + 0.1 * ds_circ['slice_6']
+        apical = 0.2 * ds_circ['slice_7'] + 0.4 * ds_circ['slice_8'] + 0.4 * apex
+
+        aha_18 = list()
+        aha_18.extend([*list(basal), *list(mid), *list(apical)])
+
+        return aha_18
 
     def _interpolate_17_aha_values(self, aha_values=None):
         """
@@ -231,15 +306,15 @@ class SmoothAHAPlot:
         full_map = np.flip(full_map, 0)
 
         print(full_map.shape)
-        y_0 = [0, 0.04, 0.12, 0.22, 0.34, 0.5, 0.66, 0.83, 1]
+        y_0 = [0, 0.1, 0.2, 0.3, 0.4, 0.55, 0.7, 0.85, 1]
 
         f = interp1d(y_0, full_map, axis=0)
         full_map_interp = f(np.linspace(0, 1, res_y))
 
         return full_map_interp
 
-    def bullseye_17_smooth(self, fig, ax, cmap='jet', norm=None, units='Units', title='Smooth 17 AHA plot',
-                           smooth_contour=False, echop=False):
+    def bullseye_17_smooth(self, fig, ax, cmap='jet', color_seg_names=False, norm=None, units='Units',
+                           title='Smooth 17 AHA plot', smooth_contour=False, echop=False):
         """
         Function to create the smooth representation of the AHA 17 segment plot
         :param fig: matplotlib.pyplot.figure
@@ -248,6 +323,8 @@ class SmoothAHAPlot:
             Axes of the figure, for 17 AHA and colorbar.
         :param cmap: ColorMap or None, optional
             Optional argument to set the desired colormap
+        :param color_seg_names: boolean, default - False
+            Whether or not to color the segment names with traditional echocardiography colors
         :param norm: tuple, BoundaryNorm or None
             Tuple (vmin, vmax) - normalize data into the [0.0, 1.0] range with minimum and maximum desired values.
         :param units: str
@@ -321,6 +398,7 @@ class SmoothAHAPlot:
             return -1
 
         r = np.linspace(0, 1, interp_data.shape[0])
+        float_values = False
         # ==============================================================================================================
 
         # -----Fill segments -------------------------------------------------------------------------------------------
@@ -337,34 +415,40 @@ class SmoothAHAPlot:
             ax.pcolormesh(theta0, r0, z, cmap=cmap, norm=norm)
 
         if len(self.seg_values) == 65:
-            self._interpolate_65_to_17_values()
+            self.seg_values = self._downsample_65_to_17_values()
+            float_values = True
 
         # Annotate
         for i in range(6):
             # Segments 1-6
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[73:]),  # position (circumferential, norm)
-                    int(self.seg_values[i]),  # value
+                    np.round(self.seg_values[i], 1) if float_values else int(self.seg_values[i]),  # values
                     fontsize=20, ha='center', va='center', color='w',  # font options
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             # Segments 7-12
-            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[46:73]), int(self.seg_values[i+6]),
+            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), np.mean(r[46:73]),
+                    np.round(self.seg_values[i+6], 1) if float_values else int(self.seg_values[i+6]),  # values
                     fontsize=20, ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             # Segment names
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align_12), r[-1] + seg_names_pos[i], seg_names[i],
-                    fontsize=20, ha='center', va='center', rotation=rot[i], weight='bold',
-                    color=self.COLORS[i], path_effects=[pef.Stroke(linewidth=1, foreground='k'), pef.Normal()])
+                    fontsize=20, ha='center', va='center', rotation=rot[i], weight='bold' if color_seg_names else None,
+                    color=self.COLORS[i] if color_seg_names else 'k',
+                    path_effects=[pef.Stroke(linewidth=1, foreground='k'), pef.Normal()]if color_seg_names else None)
         # Segments 13-16
         for i in range(4):
-            ax.text(np.deg2rad(i * 90) + np.deg2rad(seg_align_13_16[i]), np.mean(r[20:46]), int(self.seg_values[i + 12]),
+            ax.text(np.deg2rad(i * 90) + np.deg2rad(seg_align_13_16[i]), np.mean(r[20:46]),
+                    np.round(self.seg_values[i + 12], 1) if float_values else int(self.seg_values[i + 12]),  # values
                     fontsize=20, ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
         # Segment 17
-        ax.text(0, 0, int(self.seg_values[16]), fontsize=20, ha='center', va='center', color='w',
+        ax.text(0, 0,
+                np.round(self.seg_values[16], 1) if float_values else int(self.seg_values[16]),  # value
+                fontsize=20, ha='center', va='center', color='w',
                 path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
         # ==============================================================================================================
 
-        # -----Add plot featres-----------------------------------------------------------------------------------------
+        # -----Add plot featres-----------------------------------------v-----------------------------------------------
         # Create the axis for the colorbars
         bar = fig.add_axes([0.05, 0.1, 0.2, 0.05])
         cb1 = mpl.colorbar.ColorbarBase(bar, cmap=cmap, norm=norm, orientation='horizontal')
@@ -380,8 +464,8 @@ class SmoothAHAPlot:
 
         return fig
 
-    def bullseye_18_smooth(self, fig, ax, cmap='jet', norm=None, units='Units', title='Smooth 18 AHA plot',
-                           smooth_contour=False, echop=False):
+    def bullseye_18_smooth(self, fig, ax, cmap='jet', color_seg_names=False, norm=None, units='Units',
+                           title='Smooth 18 AHA plot', smooth_contour=False, echop=False):
         """
         Function to create the smooth representation of the AHA 18 segment plot
         :param fig: matplotlib.pyplot.figure
@@ -390,6 +474,8 @@ class SmoothAHAPlot:
             Axes of the figure, for 18 AHA and colorbar.
         :param cmap: ColorMap or None, optional
             Optional argument to set the desired colormap
+        :param color_seg_names: boolean, default - False
+            Whether or not to color the segment names with traditional echocardiography colors
         :param norm: tuple, BoundaryNorm or None
             Tuple (vmin, vmax) - normalize data into the [0.0, 1.0] range with minimum and maximum desired values.
         :param units: str
@@ -441,6 +527,27 @@ class SmoothAHAPlot:
             theta_i = np.deg2rad(i * 60)
             ax.plot([theta_i, theta_i], [0, 1], '-k', lw=linewidth)
 
+        # testing
+        # r = np.linspace(0.2, 1, 4)
+        # linewidth = 2
+        # # Create the radial bounds
+        # for i in range(r.shape[0]):
+        #     ax.plot(theta, np.repeat(r[i], theta.shape), '--r', lw=linewidth)
+        #
+        # # Create the bounds for the segments 1-12
+        # for i in range(6):
+        #     theta_i = np.deg2rad(i * 60)
+        #     ax.plot([theta_i, theta_i], [r[1], 1], '--y', lw=linewidth)
+        #
+        # # Create the bounds for the segments 13-16
+        # for i in range(4):
+        #     theta_i = np.deg2rad(i * 90 - 45)
+        #     if echop:
+        #         theta_i += np.pi / 4
+        #     ax.plot([theta_i, theta_i], [r[0], r[1]], '--g', lw=linewidth)
+        # plt.show()
+        # exit()
+        # END testing
         # ==============================================================================================================
 
         # -----Linear interpolation-------------------------------------------------------------------------------------
@@ -455,6 +562,7 @@ class SmoothAHAPlot:
             return -1
 
         r = np.linspace(0, 1, interp_data.shape[0])
+        float_values = False
         # ==============================================================================================================
 
         # -----Fill segments 1:18---------------------------------------------------------------------------------------
@@ -465,21 +573,29 @@ class SmoothAHAPlot:
         z = interp_data
         z = z.T
 
+        if len(self.seg_values) == 65:
+            self.seg_values = self._downsample_65_to_18_values()
+            float_values = True
+
         # Annotate
         for i in range(6):
-            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.84, int(self.seg_values[i]), fontsize=20,
-                    ha='center', va='center', color='w',
+            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.84,
+                    np.round(self.seg_values[i], 1) if float_values else int(self.seg_values[i]),
+                    fontsize=20, ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
-            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.55, int(self.seg_values[i + 6]), fontsize=20,
-                    ha='center', va='center', color='w',
+            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.55,
+                    np.round(self.seg_values[i+6], 1) if float_values else int(self.seg_values[i + 6]),
+                    fontsize=20, ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
-            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.25, int(self.seg_values[i + 12]), fontsize=20,
-                    ha='center', va='center', color='w',
+            ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), 0.25,
+                    np.round(self.seg_values[i+12], 1) if float_values else int(self.seg_values[i + 12]),
+                    fontsize=20, ha='center', va='center', color='w',
                     path_effects=[pef.Stroke(linewidth=3, foreground='k'), pef.Normal()])
             # Segment names
             ax.text(np.deg2rad(i * 60) + np.deg2rad(seg_align), r[-1] + seg_names_pos[i], seg_names[i],
                     fontsize=20, ha='center',  va='center', rotation=rot[i],
-                    color=self.COLORS[i], path_effects=[pef.Stroke(linewidth=1, foreground='k'), pef.Normal()])
+                    color=self.COLORS[i] if color_seg_names else 'k',
+                    path_effects=[pef.Stroke(linewidth=1, foreground='k'), pef.Normal()] if color_seg_names else None)
         # Colour
         if smooth_contour and (self.levels is not None):
             cf = ax.contourf(theta0, r0, z, cmap=cmap, levels=self.levels)
@@ -548,10 +664,8 @@ class SmoothAHAPlot:
 
     def plot_wall_thickness(self, filename='', data=None, echop=False):
 
-        # self.seg_values = self._get_segmental_values(data)
-
-        cmap = plt.get_cmap('seismic')
-        norm = (3, 10)
+        cmap = plt.get_cmap('RdYlBu_r')
+        norm = (4, 10)
         fig, ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=1,
                                subplot_kw=dict(projection='polar'))
         if self.n_segments == 18:
@@ -561,3 +675,13 @@ class SmoothAHAPlot:
             fig = self.bullseye_17_smooth(fig=fig, ax=ax, cmap=cmap, norm=norm, title='Wall thickness',
                                           units='mm', smooth_contour=False, echop=echop)
         fig.savefig(os.path.join(self.output_path, filename))
+
+
+if __name__ == '__main__':
+    test_exnode = r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\ExFiles\MeanEigen1Scalen97.exnode'
+    wt = calc_wall_thickness(test_exnode)
+    plot_wt = SmoothAHAPlot(wt, r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\ExFiles', n_segments=17)
+    plot_wt.plot_wall_thickness('WT_test2.png')
+    plot_wt.seg_values = wt
+    plot_wt.n_segments = 18
+    plot_wt.plot_wall_thickness('WT_test18.png')
