@@ -669,7 +669,7 @@ class SmoothAHAPlot:
             self.seg_values = data
 
         cmap = plt.get_cmap('coolwarm')
-        norm = (-0.5, 0.5)
+        norm = (-1.0, 1.0)
         fig, ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=1, subplot_kw=dict(projection='polar'))
         if self.n_segments == 18:
             fig = self.bullseye_18_smooth(fig=fig, ax=ax, cmap=cmap, norm=norm, title='Wall thickness',
@@ -687,10 +687,10 @@ if __name__ == '__main__':
     #     wt = calc_wall_thickness(test_exnode)
     #     plot_wt = SmoothAHAPlot(wt, r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\Thicknesses', n_segments=17)
     #     plot_wt.plot_wall_thickness('WT_Group_{}.png'.format(group))
-    group_a = 3
-    group_b = 7
-    exnode1 = r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\ExFiles\MeanGroup{}_SGenRLVL_s4_c3.exnode'.format(group_a)
+    group_a = 1
+    group_b = 3
+    exnode1 = r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\V1Pre-V2Pre-V1Full-V2Full\ExNodes\MeanGroup{}_SGenRLVL_s4_c7.exnode'.format(group_a)
     exnode5 = r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\ExFiles\MeanGroup{}_SGenRLVL_s4_c3.exnode'.format(group_b)
     wt_diff = wt_difference(exnode1, exnode5)
-    plot_wt = SmoothAHAPlot(wt_diff, r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\All\Thicknesses', n_segments=17)
+    plot_wt = SmoothAHAPlot(wt_diff, r'G:\Tephra\Processed\AtlasOutputLVLrv\Averages\V1Pre-V2Pre-V1Full-V2Full\Thicknesses', n_segments=17)
     plot_wt.plot_wt_difference('WT_differences_{}_{}.png'.format(group_a, group_b))
