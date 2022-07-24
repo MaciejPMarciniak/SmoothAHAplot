@@ -109,11 +109,9 @@ aha.plot_myocardial_work(filename='', data=None, echop=False)
 
 ---
 # Credits
-EuroEcho 2019 Abstract:
-*Myocardial work in hypertension and mitral regurgitation- insights from non-invasive assessment of left ventricular 
-pressure-strain relations*
+Please quote the following publication:
 
-Acknowledgements to Joao Filipe Fernandes and Filip Loncaric for their invaluable input. 
+Loncaric, F., Marciniak, M., Nunno, L. et al. *Distribution of myocardial work in arterial hypertension: insights from non-invasive left ventricular pressure-strain relations.* Int J Cardiovasc Imaging (2020). https://doi.org/10.1007/s10554-020-01969-4
 
 ---
 # License
