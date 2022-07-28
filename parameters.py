@@ -1,4 +1,5 @@
 from typing import Tuple
+import numpy as np
 
 # pandas Series/dictionary must have following index/keys:
 AHA_SEGMENT_NAMES = {
@@ -18,9 +19,6 @@ AHA_SEGMENT_NAMES = {
 
     'walls': ['Anterior', 'Anteroseptal', 'Inferoseptal', 'Inferior', 'Inferolateral', 'Anterolateral']}
 
-# EchoPAC version of the names:
-ECHOPAC_SEGMENT_NAMES = ['ANT', 'ANT_SEPT', 'SEPT', 'INF', 'POST', 'LAT']
-
 
 class InterpolationParameters:
 
@@ -34,7 +32,7 @@ class InterpolationParameters:
         return self._resolution
 
     @resolution.setter
-    def resolution(self, res: Tuple[int, int]):
+    def resolution(self, res: Tuple[int]):
         assert res[0] > 0, 'Resolution x must be greater than 0'
         assert res[1] > 0, 'Resolution y must be greater than 0'
         assert len(res) == 2, 'Exactly 2 resolution parameters are allowed'
@@ -45,10 +43,14 @@ class InterpolationParameters:
         return self._plot_levels
 
     @plot_levels.setter
-    def plot_levels(self, levels: Tuple[float, float, float, float, float]):
+    def plot_levels(self, levels: Tuple[float]):
         for level in levels:
             assert 0 <= level <= 1, 'Level value must be between 0 and 1'
         self._plot_levels = levels
+
+    @property
+    def radial_position(self):
+        return np.linspace(0, 1, self.resolution[1])
 
 
 class AHA17Parameters(InterpolationParameters):
