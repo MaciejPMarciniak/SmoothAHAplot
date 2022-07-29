@@ -18,9 +18,8 @@ class PlotStyle:
     _segment_border_style = {'linewidth': 2, 'linestyle': '-', 'color': 'k', }
 
     _positional_parameters = {'segment_name_orientations': (0, 60, -60, 0, 60, -60),
-                              'segment_align_12_angle': 90,
-                              'segment_align_13_16_angle': np.repeat([90], 4),
-                              'segment_names_positions': np.repeat([0.06], 6)}
+                              'segment_names_direction': 90,
+                              'segment_names_position': 0.06}
 
     @property
     def values_style(self):
@@ -50,9 +49,14 @@ class PlotUtil:
     @property
     def seg_align(self):
         return self._segment_alignment_angle
+
     @staticmethod
     def _shift_by_60(x: int) -> int:
         return x * 60
+
+    @staticmethod
+    def _shift_by_60_with_correction(x: int):
+        return x * 60 + 90
 
     @staticmethod
     def _shift_by_90(x: int) -> int:
@@ -68,4 +72,4 @@ class PlotUtil:
 
     @property
     def annotation_shift_functions(self):
-        return {4: self._shift_by_90, 6: self._shift_by_60}
+        return {4: self._shift_by_90, 6: self._shift_by_60_with_correction}

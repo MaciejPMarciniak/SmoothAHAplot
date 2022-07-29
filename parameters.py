@@ -64,4 +64,4 @@ class AHA18Parameters(InterpolationParameters):
 
     def __init__(self):
         super().__init__()
-        self.plot_levels = [0, 0.28, 0.5, 0.8, 1]
+        self.plot_levels = (0, 0.28, 0.5, 0.8, 1)

@@ -12,23 +12,23 @@ import parameters
 from plot_style import PlotStyle, PlotUtil
 from wt_from_ex_files import ExNodeParser
 
-from typing import List, Dict, Union, Optional
+from typing import Dict, List, Optional, Tuple, Union
 
 
 def confirm_segment_number(func):
     def inner(self, *args, **kwargs):
-        if not (len(self._n_segments) == 17 or len(self._n_segments) == 18):
+        if not (self._n_segments == 17 or self._n_segments == 18):
             raise SegmentSizeError(
-                f'Incorrect number of segment values provided: {len(self._n_segments)}. Provide either '
+                f'Incorrect number of segment values provided: {self._n_segments}. Provide either '
                 f'17 or 18 segment values')
-        func(self, *args, **kwargs)
+        return func(self, *args, **kwargs)
 
     return inner
 
 
 class AHASegmentalValues:
 
-    def __init__(self, segments: pd.Series | Dict):
+    def __init__(self, segments: Union[pd.Series, Dict]):
         self._segments = None
         self._n_segments = 0
         self.segments = segments
@@ -80,11 +80,12 @@ class AHAInterpolation:
 
     def __init__(self, segmental_values: List[int]):
         self._segmental_values = None
-        self._n_segments = 0
+        self._n_segments = 17
         self.interpolated_values = None
+        self.ip = None
 
         self.segmental_values = segmental_values
-        self.ip = self._assign_interpolation_parameters()
+        self._assign_interpolation_parameters()
 
     @property
     def segmental_values(self):
@@ -97,10 +98,10 @@ class AHAInterpolation:
         self._n_segments = len(self._segmental_values)
 
     @confirm_segment_number
-    def _assign_interpolation_parameters(self) -> parameters.InterpolationParameters:
+    def _assign_interpolation_parameters(self):
         if self._n_segments == 17:
-            return parameters.AHA17Parameters()
-        return parameters.AHA18Parameters()
+            self.ip = parameters.AHA17Parameters()
+        self.ip = parameters.AHA18Parameters()
 
     def _interpolate_directions(self, regional_values: List[int]) -> np.ndarray:
         res = self.ip.resolution[0]
@@ -114,13 +115,12 @@ class AHAInterpolation:
         return interpolated_array
 
     @staticmethod
-    def basal_mid(basal: np.ndarray, mid: np.ndarray) -> np.ndarray:
+    def _basal_mid(basal: np.ndarray, mid: np.ndarray) -> np.ndarray:
         """
         :return: Helper array for better basal segments visualization
         """
         return (basal * 3 + mid) / 4
 
-    @confirm_segment_number
     def _interpolate_17_aha_values_along_circle(self):
         """
         Interpolate the initial 17 values, to achieve smooth transition among segments.
@@ -131,7 +131,6 @@ class AHAInterpolation:
         apex = np.repeat(self.segmental_values[16], self.ip.resolution[0])
         return basal, mid, apex_mid, apex
 
-    @confirm_segment_number
     def _interpolate_18_aha_values_along_circle(self):
         """
         Interpolate the initial 18 values, to achieve smooth transition among segments.
@@ -151,7 +150,7 @@ class AHAInterpolation:
 
         # Set up the circular interpolation matrices
         basal, mid, apex_mid, apex = interp_func()
-        along_x = np.array([basal, self.basal_mid(basal, mid), mid, apex_mid, apex])
+        along_x = np.array([basal, self._basal_mid(basal, mid), mid, apex_mid, apex])
 
         # Adjust to visualisation
         along_x = np.roll(along_x, int(self.ip.resolution[0] / 4), axis=1)
@@ -183,6 +182,10 @@ class AHAPlotting:
         self._output_path: str = None
         self._theta = None
 
+        self.ps = PlotStyle()
+        self.pu = PlotUtil()
+        self.ip = parameters.AHA17Parameters()
+
         self.segment_values = values
         self.output_path = plot_output_path
         self.theta = np.linspace(0, 2 * np.pi, self.ip.resolution[0])
@@ -193,19 +196,14 @@ class AHAPlotting:
         self.fig, self.ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=1, subplot_kw=dict(projection='polar'))
         self.levels = None
 
-        self.ps = PlotStyle()
-        self.pu = PlotUtil()
-        self.ip = parameters.AHA17Parameters()
-
     @property
     def segment_values(self) -> List[int]:
         return self._segment_values
 
-    @confirm_segment_number
     @segment_values.setter
     def segment_values(self, values: List[int]):
-        self._segment_values = values
         self._n_segments = len(values)
+        self._segment_values = values
 
     @property
     def n_segments(self):
@@ -217,8 +215,8 @@ class AHAPlotting:
 
     @theta.setter
     def theta(self, angles: np.ndarray):
-        assert len(angles) == self.ip.resolution[0], ('Number of provided angle values {len(angles)} does not match the ' 
-                                                     ' desired resolution (self.ip.resolution[0]}')
+        assert len(angles) == self.ip.resolution[0], ('Number of provided angle values {len(angles)} does not match the' 
+                                                      ' desired resolution (self.ip.resolution[0]}')
         self._theta = angles
 
     @property
@@ -228,10 +226,9 @@ class AHAPlotting:
     def _write_segment_names(self):
         for wall in range(len(parameters.AHA_SEGMENT_NAMES['walls'])):
 
-            segment_name_direction = np.deg2rad(self.pu.annotation_shift_functions(
-                len(parameters.AHA_SEGMENT_NAMES['walls']))(wall)) \
-                                     + np.deg2rad(self.ps.positional_parameters['segment_align_12_angle'])
-            segment_name_position = self.ip.radial_position[-1] + self.ps.positional_parameters['segment_names_positions'][wall]
+            segment_name_direction = np.deg2rad(self.pu.annotation_shift_functions[
+                len(parameters.AHA_SEGMENT_NAMES['walls'])](wall))
+            segment_name_position = self.ip.radial_position[-1] + self.ps.positional_parameters['segment_names_position']
             segment_name = parameters.AHA_SEGMENT_NAMES['walls'][wall]
             segment_name_orientation = self.ps.positional_parameters['segment_name_orientations'][wall]
 
@@ -258,15 +255,14 @@ class AHAPlotting:
                          **self.ps.segment_border_style)
 
     def _draw_outer_bounds(self):
-       self._draw_bounds(self.ps.aha_bounds[self.n_segments][1], 1, 6)
+        self._draw_bounds(self.ps.aha_bounds[self._n_segments][1], 1, 6)
 
     @confirm_segment_number
-
     def _draw_inner_bounds(self):
-        if self.n_segments == 17:
-            self._draw_bounds(self.ps.aha_bounds[self.n_segments][0], self.ps.aha_bounds[self.n_segments][1], 4)
+        if self._n_segments == 17:
+            self._draw_bounds(self.ps.aha_bounds[self._n_segments][0], self.ps.aha_bounds[self._n_segments][1], 4)
         else:
-            self._draw_bounds(0, self.ps.aha_bounds[self.n_segments][0], 6)
+            self._draw_bounds(0, self.ps.aha_bounds[self._n_segments][0], 6)
 
     def _draw_aha_bounds(self):
         self._draw_radial_bounds()
@@ -281,13 +277,13 @@ class AHAPlotting:
         return 0 if np.abs(np.round(value, 1)) < 0.1 else int(value)
 
     def _get_annotation_angle(self, n_level_segments: int, segment: int):
-        return self.pu.annotation_shift_functions[n_level_segments](segment)
+        return np.deg2rad(self.pu.annotation_shift_functions[n_level_segments](segment))
 
     def _annotate_basal_segments(self):
         _n_level_segments = len(parameters.AHA_SEGMENT_NAMES['walls'])
         for segment in range(_n_level_segments):
             angle = self._get_annotation_angle(_n_level_segments, segment)
-            position = np.mean(self.ps.aha_bounds[-2], self.ps.aha_bounds[-1])[0]
+            position = float(np.mean([self.ps.aha_bounds[self.n_segments][-2], self.ps.aha_bounds[self.n_segments][-1]]))
             value = self._fix_negative_zero(self.segment_values[segment])
             self._annotate_segment(angle, position, value)
 
@@ -295,16 +291,16 @@ class AHAPlotting:
         _n_level_segments = len(parameters.AHA_SEGMENT_NAMES['walls'])
         for segment in range(_n_level_segments):
             angle = self._get_annotation_angle(_n_level_segments, segment)
-            position = np.mean(self.ps.aha_bounds[-3], self.ps.aha_bounds[-2])[0]
+            position = float(np.mean([self.ps.aha_bounds[self.n_segments][-3], self.ps.aha_bounds[self.n_segments][-2]]))
             value = self._fix_negative_zero(self.segment_values[segment+6])
             self._annotate_segment(angle, position, value)
 
     def _annotate_apical_segments(self):
-        if self.n_segments == 17:
+        if self._n_segments == 17:
             _n_level_segments = 4
             for segment in range(_n_level_segments):
                 angle = self._get_annotation_angle(_n_level_segments, segment)
-                position = np.mean(self.ps.aha_bounds[0], self.ps.aha_bounds[1])[0]
+                position = float(np.mean([self.ps.aha_bounds[self.n_segments][0], self.ps.aha_bounds[self.n_segments][1]]))
                 value = self._fix_negative_zero(self.segment_values[segment + 12])
                 self._annotate_segment(angle, position, value)
 
@@ -315,7 +311,7 @@ class AHAPlotting:
             _n_level_segments = len(parameters.AHA_SEGMENT_NAMES['walls'])
             for segment in range(_n_level_segments):
                 angle = self._get_annotation_angle(_n_level_segments, segment)
-                position = np.mean(0, self.ps.aha_bounds[0])[0]
+                position = float(np.mean([0, self.ps.aha_bounds[0]]))
                 value = self._fix_negative_zero(self.segment_values[segment + 12])
                 self._annotate_segment(angle, position, value)
 
@@ -324,17 +320,17 @@ class AHAPlotting:
         self._annotate_mid_segments()
         self._annotate_apical_segments()
 
-
     def _clear_bullseye_plot(self):
         self.ax.set_yticklabels([])
         self.ax.set_xticklabels([])
         self.ax.set_ylim([0, 1])
 
-    def _normalize_data(self, norm: Optional[BoundaryNorm] = None):
+    def _normalize_data(self, norm: Optional[Union[BoundaryNorm, Tuple[int, int]]] = None):
         if norm is None:
             norm = mpl.colors.Normalize(vmin=self.seg_values.min(), vmax=self.seg_values.max())
         elif isinstance(norm, tuple) and len(norm) == 2:
             norm = mpl.colors.Normalize(vmin=norm[0], vmax=norm[1])
+        print(norm)
         return norm
 
     def _add_color_bar(self, units: str = 'Units', cmap: str = 'jet', norm = None):
@@ -343,11 +339,10 @@ class AHAPlotting:
         cb1.set_label(units, size=16)
         cb1.ax.tick_params(labelsize=14, which='major')
 
-    def _color_plot(self, cmap:str = 'jet', norm = None, smooth_contour = False):
+    def _color_plot(self, cmap: str = 'jet', norm=None, smooth_contour=False):
         extended_radial_position = np.repeat(self.ip.radial_position[:, np.newaxis], self.ip.resolution[0], axis=1).T
         extended_radial_angle = np.repeat(self.theta[:, np.newaxis], extended_radial_position.shape[1], axis=1)
-        ravelled_segment_values = np.array(self.interpolated_segment_values).ravel().T
-
+        ravelled_segment_values = np.array(self.interpolated_segment_values).T
         # Color the plot
         if smooth_contour and (self.levels is not None):
             cf = self.ax.contourf(extended_radial_angle, extended_radial_position, ravelled_segment_values, cmap=cmap,
@@ -357,7 +352,7 @@ class AHAPlotting:
             self.ax.pcolormesh(extended_radial_angle, extended_radial_position, ravelled_segment_values, cmap=cmap,
                                norm=norm)
 
-    def bullseye_17_smooth(self, cmap: str ='jet', norm: Optional[BoundaryNorm] = None,
+    def bullseye_17_smooth(self, cmap: str ='jet', norm: Optional[Union[BoundaryNorm, Tuple[int, int]]] = None,
                            title: str ='Smooth 17 AHA plot', smooth_contour: bool =False, units: str = ''):
         """
         Function to create the smooth representation of the AHA 17 segment plot
@@ -375,17 +370,14 @@ class AHAPlotting:
             The figure on which the 17 AHA plot has been drawn
         """
 
-        # Draw template
         self._draw_aha_bounds()
         self._write_segment_names()
         self._clear_bullseye_plot()
 
-        # Colour the plot
         normalized_data = self._normalize_data(norm)
         self._color_plot(cmap, normalized_data, smooth_contour)
         self._add_color_bar(units, cmap, normalized_data)
 
-        #
         self._annotate_aha_segments()
 
         self.ax.set_title(title, fontsize=24)
@@ -498,7 +490,7 @@ class AHAPlotting:
             ax.pcolormesh(theta0, r0, z, cmap=cmap, norm=norm)
         # ==============================================================================================================
 
-        # -----Add plot featres-----------------------------------------------------------------------------------------
+        # -----Add plot features----------------------------------------------------------------------------------------
         # Create the axis for the colorbars
         bar = fig.add_axes([0.05, 0.1, 0.2, 0.05])
         cb1 = mpl.colorbar.ColorbarBase(bar, cmap=cmap, norm=norm, orientation='horizontal')
@@ -514,11 +506,12 @@ class AHAPlotting:
 
         return fig
  """
+
     def _plot_setup(self, data):
 
         if data is not None:
-            assert len(data) == self.n_segments, 'Please provide correct number of segmental values for the plot. ' \
-                                                 'len(data) = {}, n_segments =  {}'.format(len(data), self.n_segments)
+            assert len(data) == self._n_segments, 'Please provide correct number of segmental values for the plot. ' \
+                                                 'len(data) = {}, n_segments =  {}'.format(len(data), self._n_segments)
             if not isinstance(data, list):
                 data = self._get_segmental_values(data)
 
@@ -531,7 +524,7 @@ class AHAPlotting:
         cmap = plt.get_cmap('rainbow')
         norm = (1000, 3000)
 
-        if self.n_segments == 18:
+        if self._n_segments == 18:
             fig = self.bullseye_18_smooth(fig=fig, ax=ax, cmap=cmap, norm=norm, title='Myocardial work index',
                                           units='mmHg%', smooth_contour=False, echop=echop)
         else:
@@ -547,7 +540,7 @@ class AHAPlotting:
         cmap = plt.get_cmap('seismic_r')
         norm = BoundaryNorm(self.levels, ncolors=cmap.N, clip=True)
         fig, ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=1, subplot_kw=dict(projection='polar'))
-        if self.n_segments == 18:
+        if self._n_segments == 18:
             fig = self.bullseye_18_smooth(fig=fig, ax=ax, cmap=cmap, norm=norm, title='Longitudinal strain', units='%',
                                           smooth_contour=True, echop=echop)
         else:
