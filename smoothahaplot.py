@@ -1,10 +1,10 @@
 import os
+
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import matplotlib.patheffects as pef
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 
@@ -311,7 +311,7 @@ class AHAPlotting:
             n_level_segments = len(parameters.AHA_SEGMENT_NAMES['walls'])
             for segment in range(n_level_segments):
                 angle = self._get_annotation_angle(n_level_segments, segment)
-                position = float(np.mean([0, self.ps.aha_bounds[0]]))
+                position = float(np.mean([0, self.ps.aha_bounds[self.n_segments][0]]))
                 value = self._fix_negative_zero(self.segment_values[segment + 12])
                 self._annotate_segment(angle, position, value)
 
@@ -348,7 +348,7 @@ class AHAPlotting:
             levels = MaxNLocator(nbins=12).tick_values(-30, 30)
             cf = self.ax.contourf(extended_radial_angle, extended_radial_position, ravelled_segment_values, cmap=cmap,
                                   levels=levels)
-            cf.ax.axis('off')
+            cf.axes.grid(None)
         else:
             self.ax.pcolormesh(extended_radial_angle, extended_radial_position, ravelled_segment_values, cmap=cmap,
                                norm=norm)
@@ -381,7 +381,7 @@ class AHAPlotting:
 
         self._annotate_aha_segments()
 
-        self.ax.set_title(title, fontsize=24)
+        self.ax.set_title(title, fontsize=24, pad=40)
 
         return self.fig
 

@@ -16,6 +16,8 @@
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
+.idea/AHA 17 smooth.iml
+.idea/misc.xml
 
 # File-based project format:
 *.iws
