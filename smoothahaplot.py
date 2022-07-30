@@ -280,26 +280,26 @@ class AHAPlotting:
         return np.deg2rad(self.pu.annotation_shift_functions[n_level_segments](segment))
 
     def _annotate_basal_segments(self):
-        _n_level_segments = len(parameters.AHA_SEGMENT_NAMES['walls'])
-        for segment in range(_n_level_segments):
-            angle = self._get_annotation_angle(_n_level_segments, segment)
+        n_level_segments = len(parameters.AHA_SEGMENT_NAMES['walls'])
+        for segment in range(n_level_segments):
+            angle = self._get_annotation_angle(n_level_segments, segment)
             position = float(np.mean([self.ps.aha_bounds[self.n_segments][-2], self.ps.aha_bounds[self.n_segments][-1]]))
             value = self._fix_negative_zero(self.segment_values[segment])
             self._annotate_segment(angle, position, value)
 
     def _annotate_mid_segments(self):
-        _n_level_segments = len(parameters.AHA_SEGMENT_NAMES['walls'])
-        for segment in range(_n_level_segments):
-            angle = self._get_annotation_angle(_n_level_segments, segment)
+        n_level_segments = len(parameters.AHA_SEGMENT_NAMES['walls'])
+        for segment in range(n_level_segments):
+            angle = self._get_annotation_angle(n_level_segments, segment)
             position = float(np.mean([self.ps.aha_bounds[self.n_segments][-3], self.ps.aha_bounds[self.n_segments][-2]]))
             value = self._fix_negative_zero(self.segment_values[segment+6])
             self._annotate_segment(angle, position, value)
 
     def _annotate_apical_segments(self):
         if self._n_segments == 17:
-            _n_level_segments = 4
-            for segment in range(_n_level_segments):
-                angle = self._get_annotation_angle(_n_level_segments, segment)
+            n_level_segments = 4
+            for segment in range(n_level_segments):
+                angle = self._get_annotation_angle(n_level_segments, segment)
                 position = float(np.mean([self.ps.aha_bounds[self.n_segments][0], self.ps.aha_bounds[self.n_segments][1]]))
                 value = self._fix_negative_zero(self.segment_values[segment + 12])
                 self._annotate_segment(angle, position, value)
@@ -308,9 +308,9 @@ class AHAPlotting:
             value = self._fix_negative_zero(self.segment_values[-1])
             self._annotate_segment(angle, position, value)
         else:
-            _n_level_segments = len(parameters.AHA_SEGMENT_NAMES['walls'])
-            for segment in range(_n_level_segments):
-                angle = self._get_annotation_angle(_n_level_segments, segment)
+            n_level_segments = len(parameters.AHA_SEGMENT_NAMES['walls'])
+            for segment in range(n_level_segments):
+                angle = self._get_annotation_angle(n_level_segments, segment)
                 position = float(np.mean([0, self.ps.aha_bounds[0]]))
                 value = self._fix_negative_zero(self.segment_values[segment + 12])
                 self._annotate_segment(angle, position, value)
@@ -344,9 +344,10 @@ class AHAPlotting:
         extended_radial_angle = np.repeat(self.theta[:, np.newaxis], extended_radial_position.shape[1], axis=1)
         ravelled_segment_values = np.array(self.interpolated_segment_values).T
         # Color the plot
-        if smooth_contour and (self.levels is not None):
+        if smooth_contour:
+            levels = MaxNLocator(nbins=12).tick_values(-30, 30)
             cf = self.ax.contourf(extended_radial_angle, extended_radial_position, ravelled_segment_values, cmap=cmap,
-                                  levels=self.levels)
+                                  levels=levels)
             cf.ax.axis('off')
         else:
             self.ax.pcolormesh(extended_radial_angle, extended_radial_position, ravelled_segment_values, cmap=cmap,

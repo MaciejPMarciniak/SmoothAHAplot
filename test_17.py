@@ -1,5 +1,7 @@
 from smoothahaplot import AHAPlotting
 import matplotlib.pyplot as plt
+from matplotlib.colors import BoundaryNorm
+from matplotlib.ticker import MaxNLocator
 import pandas as pd
 
 
@@ -16,11 +18,16 @@ segments_17 = ['Basal Anterior', 'Basal Anteroseptal', 'Basal Inferoseptal',
 strain_dict = {k: v for (k, v) in zip(segments_17, exp_strain_data)}
 mw_dict = {k: v for (k, v) in zip(segments_17, exp_mw_data)}
 
-aha = AHAPlotting(values=exp_mw_data, plot_output_path='./images')
-cmap = plt.get_cmap('rainbow')
-norm = (1000, 3000)
-aha.bullseye_17_smooth(cmap=cmap, norm=norm, title='Myocardial work index', units='mmHg%', smooth_contour=False)
+aha = AHAPlotting(values=exp_strain_data, plot_output_path='./images')
+# cmap = plt.get_cmap('rainbow')
+# norm = (1000, 3000)
+# aha.bullseye_17_smooth(cmap=cmap, norm=norm, title='Myocardial work index', units='mmHg%', smooth_contour=False)
 
+levels = MaxNLocator(nbins=12).tick_values(-30, 30)
+cmap = plt.get_cmap('seismic_r')
+norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
+aha.bullseye_17_smooth(cmap=cmap, norm=norm, units='%', smooth_contour=True)
+plt.show()
 # aha.plot_strain('17_AHA_strain.png', data=strain_dict)
 # aha.plot_myocardial_work('17_AHA_MW.png', data=mw_dict)
 # aha.plot_strain('17_AHA_Echo_strain.png', data=strain_dict, echop=True)
