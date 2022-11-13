@@ -331,10 +331,9 @@ class AHAPlotting:
 
     def _normalize_data(self, norm: Optional[Union[BoundaryNorm, Tuple[int, int]]] = None):
         if norm is None:
-            norm = mpl.colors.Normalize(vmin=self.seg_values.min(), vmax=self.seg_values.max())
+            norm = mpl.colors.Normalize(vmin=min(self.segment_values), vmax=max(self.segment_values))
         elif isinstance(norm, tuple) and len(norm) == 2:
             norm = mpl.colors.Normalize(vmin=norm[0], vmax=norm[1])
-        print(norm)
         return norm
 
     def _add_color_bar(self, units: str = 'Units', cmap: str = 'jet', norm = None):
@@ -347,7 +346,7 @@ class AHAPlotting:
         extended_radial_position = np.repeat(self.ip.radial_position[:, np.newaxis], self.ip.resolution[0], axis=1).T
         extended_radial_angle = np.repeat(self.theta[:, np.newaxis], extended_radial_position.shape[1], axis=1)
         ravelled_segment_values = np.array(self.interpolated_segment_values).T
-        # Color the plot
+
         if smooth_contour:
             levels = MaxNLocator(nbins=12).tick_values(-30, 30)
             cf = self.ax.contourf(extended_radial_angle, extended_radial_position, ravelled_segment_values, cmap=cmap,
@@ -357,8 +356,9 @@ class AHAPlotting:
             self.ax.pcolormesh(extended_radial_angle, extended_radial_position, ravelled_segment_values, cmap=cmap,
                                norm=norm)
 
-    def bullseye_smooth(self, cmap: str ='jet', norm: Optional[Union[BoundaryNorm, Tuple[int, int]]] = None,
-                           title: str ='Smooth 17 AHA plot', smooth_contour: bool =False, units: str = ''):
+    def bullseye_smooth(self, cmap: str = 'jet', norm: Optional[Union[BoundaryNorm, Tuple[int, int]]] = None,
+                        title: str = 'Smooth AHA plot', smooth_contour: bool = False, units: str = '',
+                        add_colorbar: bool = True):
         """
         Function to create the smooth representation of the AHA 17 segment plot
         :param cmap: ColorMap or None, optional
@@ -371,6 +371,8 @@ class AHAPlotting:
             Title of the plot
         :param smooth_contour: Bool
             Whether to smooth the plot. Useful for level-based color map
+        :param add_colorbar: Bool
+            Whether to add color bar with the scale on the side of the plot
         :return fig: matplotlib.pyplot.figure
             The figure on which the 17 AHA plot has been drawn
         """
@@ -381,7 +383,8 @@ class AHAPlotting:
 
         normalized_data = self._normalize_data(norm)
         self._color_plot(cmap, normalized_data, smooth_contour)
-        self._add_color_bar(units, cmap, normalized_data)
+        if add_colorbar:
+            self._add_color_bar(units, cmap, normalized_data)
 
         self._annotate_aha_segments()
 
