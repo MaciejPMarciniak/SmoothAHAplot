@@ -49,8 +49,12 @@ class InterpolationParameters:
         self._plot_levels = levels
 
     @property
-    def radial_position(self):
+    def radial_position(self) -> np.array:
         return np.linspace(0, 1, self.resolution[1])
+
+    @property
+    def apical_position(self) -> float:
+        return 0.25
 
 
 class AHA17Parameters(InterpolationParameters):

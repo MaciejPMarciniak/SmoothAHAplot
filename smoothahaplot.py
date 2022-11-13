@@ -177,17 +177,21 @@ class AHAPlotting:
 
     def __init__(self, values: List[int], plot_output_path: str =''):
 
-        self._segment_values: List[int] = None
-        self._n_segments: int = None
-        self._output_path: str = None
-        self._theta = None
-
-        self.ps = PlotStyle()
-        self.pu = PlotUtil()
-        self.ip = parameters.AHA17Parameters()
+        self._segment_values: List[int]
+        self._n_segments: int
+        self._output_path: str
+        self._theta: np.ndarray
 
         self.segment_values = values
         self.output_path = plot_output_path
+
+        self.ps = PlotStyle()
+        self.pu = PlotUtil()
+        if self.n_segments == 17:
+            self.ip = parameters.AHA17Parameters()
+        else:
+            self.ip = parameters.AHA18Parameters()
+
         self.theta = np.linspace(0, 2 * np.pi, self.ip.resolution[0])
 
         ai = AHAInterpolation(self.segment_values)
@@ -262,7 +266,7 @@ class AHAPlotting:
         if self._n_segments == 17:
             self._draw_bounds(self.ps.aha_bounds[self._n_segments][0], self.ps.aha_bounds[self._n_segments][1], 4)
         else:
-            self._draw_bounds(0, self.ps.aha_bounds[self._n_segments][0], 6)
+            self._draw_bounds(0, self.ps.aha_bounds[self._n_segments][1], 6)
 
     def _draw_aha_bounds(self):
         self._draw_radial_bounds()
@@ -311,7 +315,7 @@ class AHAPlotting:
             n_level_segments = len(parameters.AHA_SEGMENT_NAMES['walls'])
             for segment in range(n_level_segments):
                 angle = self._get_annotation_angle(n_level_segments, segment)
-                position = float(np.mean([0, self.ps.aha_bounds[self.n_segments][0]]))
+                position = self.ip.apical_position
                 value = self._fix_negative_zero(self.segment_values[segment + 12])
                 self._annotate_segment(angle, position, value)
 
@@ -358,7 +362,7 @@ class AHAPlotting:
         """
         Function to create the smooth representation of the AHA 17 segment plot
         :param cmap: ColorMap or None, optional
-            Optional argument to set the desired colormap
+            Set the desired colormap
         :param norm: tuple, BoundaryNorm or None
             Tuple (vmin, vmax) - normalize data into the [0.0, 1.0] range with minimum and maximum desired values.
         :param units: str
