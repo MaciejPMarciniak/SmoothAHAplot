@@ -10,7 +10,7 @@ such as strain or myocardial work. In this project, the segmental values are vis
 bullseye plots, to provide insights into the function of the LV in a palpable way. Proposed plots are smoothed, to 
 increase the readability and enhance the value of the provided medical data. Examples of strain and myocardial work 
 (with random, probable values) are provided. The plots can be generated in two versions: as described in the 
-recommendations, and as provided within the EchoPAC software (GE, Horten, Norway).
+recommendations.
 
 ## Left Ventricle Segmentation Procedure
 
@@ -23,7 +23,7 @@ in all 360° are included.
 * The basal part is divided into six segments of 60° each. The segment nomenclature along the circumference is: 
 basal anterior, basal anteroseptal, basal inferoseptal, basal inferior, basal inferolateral, and basal anterolateral. 
 The attachment of the right ventricular wall to the left ventricle can be used to identify the septum.
-* Similarly the mid-cavity part is divided into six 60° segments called mid anterior, mid anteroseptal, 
+* Similarly, the mid-cavity part is divided into six 60° segments called mid anterior, mid anteroseptal, 
 mid inferoseptal, mid inferior, mid inferolateral, and mid anterolateral.
 * In case of 17 segments:
     * Only four segments of 90° each are used for the apex because of the myocardial tapering. The segment names are 
@@ -38,14 +38,8 @@ anteroseptal, apical inferoseptal, apical inferior, apical inferolateral, and ap
 ### 17 AHA plot of Myocardial Work
 ![smooth plots](images/17_AHA_MW.png  "17 AHA plot of Myocardial Work")
 
-### 18 AHA plot of Myocardial Work - EchoPAC version
-![smooth plots](images/18_AHA_Echo_MW.png  "Myocardial Work - Echopac version")
-
 ### 18 AHA plot of Segmental Strain
 ![smooth plots](images/18_AHA_strain.png  "17 AHA plot of Segmental Strain")
-
-### 17 AHA plot of Segmental Strain - EchoPAC version
-![smooth plots](images/17_AHA_Echo_strain.png  "Segmental Strain - Echopac version")
 
 ---
 # How2use
