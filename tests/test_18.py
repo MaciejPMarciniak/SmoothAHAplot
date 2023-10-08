@@ -1,4 +1,4 @@
-from smooth_aha_plot.smooth_aha_plot import AHAPlotting
+from src.smooth_aha_plot import AHAPlotting
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
