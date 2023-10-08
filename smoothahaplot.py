@@ -328,6 +328,7 @@ class AHAPlotting:
         self.ax.set_yticklabels([])
         self.ax.set_xticklabels([])
         self.ax.set_ylim([0, 1])
+        self.ax.grid(None)
 
     def _normalize_data(self, norm: Optional[Union[BoundaryNorm, Tuple[int, int]]] = None):
         if norm is None:
@@ -349,9 +350,8 @@ class AHAPlotting:
 
         if smooth_contour:
             levels = MaxNLocator(nbins=12).tick_values(-30, 30)
-            cf = self.ax.contourf(extended_radial_angle, extended_radial_position, ravelled_segment_values, cmap=cmap,
+            self.ax.contourf(extended_radial_angle, extended_radial_position, ravelled_segment_values, cmap=cmap,
                                   levels=levels)
-            cf.axes.grid(None)
         else:
             self.ax.pcolormesh(extended_radial_angle, extended_radial_position, ravelled_segment_values, cmap=cmap,
                                norm=norm)

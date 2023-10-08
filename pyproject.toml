@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "smooth aha plot"
+version = "1.0.0"
+description = "In this project, the segmental values are visualized using the 17 and 18 segment bullseye plots, to provide insights into the function of the LV in a palpable way. Proposed plots are smoothed, to increase the readability and enhance the value of the provided medical data."
+authors = ["Maciej P Marciniak <maciej.mar92@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.11.5,<3.13"
+matplotlib = "^3.8.0"
+numpy = "^1.26.0"
+pandas = "^2.1.1"
+scipy = "^1.11.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
