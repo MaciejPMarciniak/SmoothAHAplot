@@ -5,6 +5,7 @@ node_modules/
 dist/
 __pycache__/
 .mypy_cache/
+.pytest_cache/
 .idea/*
 
 # Compiled Java class files
