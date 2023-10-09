@@ -1,0 +1,125 @@
+{
+  "aha_17": [
+    {
+      "names": [
+        "Basal Anterior",
+        "Basal Anteroseptal",
+        "Basal Inferoseptal",
+        "Basal Inferior",
+        "Basal Inferolateral",
+        "Basal Anterolateral",
+        "Mid Anterior",
+        "Mid Anteroseptal",
+        "Mid Inferoseptal",
+        "Mid Inferior",
+        "Mid Inferolateral",
+        "Mid Anterolateral",
+        "Apical Anterior",
+        "Apical Septal",
+        "Apical Inferior",
+        "Apical Lateral",
+        "Apex"
+      ]
+    },
+    {
+      "levels": [
+        0,
+        0.33,
+        0.55,
+        0.85,
+        1
+      ]
+    }
+  ],
+  "aha_18": [
+    {
+      "names": [
+        "Basal Anterior",
+        "Basal Anteroseptal",
+        "Basal Inferoseptal",
+        "Basal Inferior",
+        "Basal Inferolateral",
+        "Basal Anterolateral",
+        "Mid Anterior",
+        "Mid Anteroseptal",
+        "Mid Inferoseptal",
+        "Mid Inferior",
+        "Mid Inferolateral",
+        "Mid Anterolateral",
+        "Apical Anterior",
+        "Apical Anteroseptal",
+        "Apical Inferoseptal",
+        "Apical Inferior",
+        "Apical Inferolateral",
+        "Apical Anterolateral"
+      ]
+    },
+    {
+      "levels": [
+        0,
+        0.28,
+        0.5,
+        0.8,
+        1
+      ]
+    }
+  ],
+  "walls": [
+    "Anterior",
+    "Anteroseptal",
+    "Inferoseptal",
+    "Inferior",
+    "Inferolateral",
+    "Anterolateral"
+  ],
+  "resolution": [
+    768,
+    100
+  ],
+  "strain": [
+    {
+      "cmap": "seismic_r"
+    },
+    {
+      "tick_values": [
+        -30,
+        30
+      ]
+    },
+    {
+      "n_bins": 12
+    },
+    {
+      "units": "%"
+    },
+    {
+      "smooth_contour": true
+    },
+    {
+      "title": "Myocardial strain"
+    },
+    {
+      "clip_boundary_norm": true
+    }
+  ],
+  "myocardial_work": [
+    {
+      "cmap": "rainbow"
+    },
+    {
+      "norm_values": [
+        1000,
+        3000
+      ]
+    },
+    {
+      "units": "mmHg%"
+    },
+    {
+      "smooth_contour": false
+    },
+    {
+      "title": "Myocardial work index"
+    }
+  ]
+}
