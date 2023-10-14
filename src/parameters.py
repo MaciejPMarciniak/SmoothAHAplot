@@ -1,5 +1,19 @@
-from typing import Tuple
+import json
+from pathlib import Path
+
 import numpy as np
+
+
+def load_parameters_from_json(filename: Path) -> dict:
+    with open(filename, "r") as f:
+        return json.load(f)
+
+
+p = Path("src")
+
+AHA_FEATURES = load_parameters_from_json(p / "aha_features.json")
+BIOMARKER_FEATURES = load_parameters_from_json(p / "biomarker_features.json")
+PLOT_COMPONENTS = load_parameters_from_json(p / "plot_components.json")
 
 # pandas Series/dictionary must have following index/keys:
 AHA_SEGMENT_NAMES = {
@@ -54,6 +68,8 @@ AHA_SEGMENT_NAMES = {
 
 
 class InterpolationParameters:
+    """Set of parameters used for interpolation"""
+
     def __init__(self):
         self._resolution = (768, 100)
         self._plot_levels = ()
@@ -64,7 +80,7 @@ class InterpolationParameters:
         return self._resolution
 
     @resolution.setter
-    def resolution(self, res: Tuple[int]):
+    def resolution(self, res: tuple[int]):
         assert res[0] > 0, "Resolution x must be greater than 0"
         assert res[1] > 0, "Resolution y must be greater than 0"
         assert len(res) == 2, "Exactly 2 resolution parameters are allowed"
@@ -75,7 +91,7 @@ class InterpolationParameters:
         return self._plot_levels
 
     @plot_levels.setter
-    def plot_levels(self, levels: Tuple[float]):
+    def plot_levels(self, levels: tuple[float]):
         for level in levels:
             assert 0 <= level <= 1, "Level value must be between 0 and 1"
         self._plot_levels = levels

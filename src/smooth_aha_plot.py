@@ -1,7 +1,6 @@
 from typing import Union
 
 import numpy as np
-import pandas as pd
 from scipy.interpolate import interp1d
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -10,75 +9,6 @@ from matplotlib.ticker import MaxNLocator
 
 from src import parameters
 from src.plot_style import PlotStyle, PlotUtil
-
-
-def confirm_segment_number(func):
-    def inner(self, *args, **kwargs):
-        if not (self._n_segments == 17 or self._n_segments == 18):
-            raise SegmentSizeError(
-                f"Incorrect number of segment values provided: {self._n_segments}. Provide either "
-                f"17 or 18 segment values"
-            )
-        return func(self, *args, **kwargs)
-
-    return inner
-
-
-class AHASegmentalValues:
-    def __init__(self, segments: Union[pd.Series, dict]):
-        self._segments = None
-        self._n_segments = 0
-        self.segments = segments
-        self._segmental_values = []
-        self._get_segmental_values()
-
-    @property
-    def segments(self):
-        return self._segments
-
-    @segments.setter
-    def segments(self, new_segments: list[int]):
-        if not (len(new_segments) == 17 or len(new_segments) == 18):
-            raise SegmentSizeError(
-                f"Incorrect number of segment values provided: {len(new_segments)}. Provide either "
-                f"17 or 18 segment values"
-            )
-        self._segments = new_segments
-        self._n_segments = len(self._segments)
-
-    @confirm_segment_number
-    def _extract_values_from_dict(self):
-        for segment_name in parameters.AHA_SEGMENT_NAMES[self._n_segments]:
-            try:
-                self._segmental_values.append(self.segments[segment_name])
-            except KeyError:
-                exit(
-                    "Value of segment {} is missing. Provide values for all AHA 17/18 segments".format(
-                        segment_name
-                    )
-                )
-
-    @confirm_segment_number
-    def _extract_values_from_series(self):
-        segments_s = self.segments.reindex(parameters.AHA_SEGMENT_NAMES(self._n_segments), axis=1)
-        if segments_s.isnull().values.any():
-            exit(
-                "Segmental names are incompatibile:\n{}\n{}".format(
-                    segments_s.index, parameters.AHA_SEGMENT_NAMES(self._n_segments)
-                )
-            )
-        self._segmental_values = segments_s.values
-
-    @confirm_segment_number
-    def _get_segmental_values(self):
-        if isinstance(self.segments, dict):
-            self._extract_values_from_dict()
-        elif isinstance(self.segments, pd.Series):
-            self._extract_values_from_series()
-        else:
-            raise SegmentsError(
-                f"Unknown format of the segment list provided: {type(self.segments)}"
-            )
 
 
 class AHAInterpolation:
@@ -95,13 +25,11 @@ class AHAInterpolation:
     def segmental_values(self):
         return self._segmental_values
 
-    @confirm_segment_number
     @segmental_values.setter
     def segmental_values(self, new_values: list[int]):
         self._segmental_values = new_values
         self._n_segments = len(self._segmental_values)
 
-    @confirm_segment_number
     def _assign_interpolation_parameters(self):
         if self._n_segments == 17:
             self.ip = parameters.AHA17Parameters()
@@ -148,7 +76,6 @@ class AHAInterpolation:
         apex = np.repeat(np.sum(self.segmental_values[12:]) / 6, self.ip.resolution[0])
         return basal, mid, apex_mid, apex
 
-    @confirm_segment_number
     def interpolate_aha_values(self):
         if self._n_segments == 17:
             interp_func = self._interpolate_17_aha_values_along_circle
@@ -272,7 +199,7 @@ class AHAPlotting:
         assert 0 <= inner <= 1, f"Inner starting point value must be between 0 and 1 (is {inner})"
         assert 0 <= outer <= 1, f"Outer starting point value must be between 0 and 1 (is {outer})"
         assert inner < outer, f"Inner ({inner}) cannot be greater than outer ({outer})"
-        assert n_borders == 4 or n_borders == 6, (
+        assert n_borders in (4, 6), (
             f"Only 4 or 6 borders between segments are allowed ({n_borders} " f"provided)"
         )
 
@@ -289,7 +216,6 @@ class AHAPlotting:
     def _draw_outer_bounds(self):
         self._draw_bounds(self.ps.aha_bounds[self._n_segments][1], 1, 6)
 
-    @confirm_segment_number
     def _draw_inner_bounds(self):
         if self._n_segments == 17:
             self._draw_bounds(
@@ -464,11 +390,3 @@ class AHAPlotting:
         self.ax.set_title(title, fontsize=24, pad=40)
 
         return self.fig
-
-
-class SegmentsError(AttributeError):
-    """An error related to AHA segments"""
-
-
-class SegmentSizeError(SegmentsError):
-    """An error related to number of segments"""

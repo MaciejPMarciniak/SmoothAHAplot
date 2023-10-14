@@ -4,15 +4,14 @@ import matplotlib.pyplot as plt
 from parameters import AHA17Parameters
 
 
-def draw_interpolation_positions(levels: tuple(int, ...)) -> None:
+def draw_interpolation_positions(levels: tuple[int, ...]) -> None:
     """
     Show interpolation levels on the plot
     """
-    x = levels
-    _, ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=1, subplot_kw=dict(projection="polar"))
+    _, ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=1, subplot_kw={"projection": "polar"})
     ip = AHA17Parameters()
 
-    r = np.linspace(0.2, 1, 4)
+    r = levels
     theta = np.linspace(0, 2 * np.pi, ip.resolution[0])
     linewidth = 2
 
@@ -61,4 +60,4 @@ def draw_interpolation_positions(levels: tuple(int, ...)) -> None:
 
 
 if __name__ == "__main__":
-    draw_interpolation_positions(1)
+    draw_interpolation_positions(np.linspace(0.2, 1, 4))

@@ -69,6 +69,7 @@ scipy = "^1.11.3"
 loguru = "^0.6.0"
 tqdm = "^4.64.1"
 pylint = "^3.0.1"
+pydantic = "^2.4.2"
 
 [tool.poetry.group.dev.dependencies]
 black = { extras = ["d"], version = "^23.9.1" }
