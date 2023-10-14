@@ -1,100 +1,13 @@
 from typing import Union
 
 import numpy as np
-from scipy.interpolate import interp1d
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 
-from src import parameters
+from src import parameters, aha_interpolation
 from src.plot_style import PlotStyle, PlotUtil
-
-
-class AHAInterpolation:
-    def __init__(self, segmental_values: list[int]):
-        self._segmental_values = None
-        self._n_segments = 17
-        self.interpolated_values = None
-        self.ip = None
-
-        self.segmental_values = segmental_values
-        self._assign_interpolation_parameters()
-
-    @property
-    def segmental_values(self):
-        return self._segmental_values
-
-    @segmental_values.setter
-    def segmental_values(self, new_values: list[int]):
-        self._segmental_values = new_values
-        self._n_segments = len(self._segmental_values)
-
-    def _assign_interpolation_parameters(self):
-        if self._n_segments == 17:
-            self.ip = parameters.AHA17Parameters()
-        self.ip = parameters.AHA18Parameters()
-
-    def _interpolate_directions(self, regional_values: list[int]) -> np.ndarray:
-        res = self.ip.resolution[0]
-        n_segments = len(regional_values)
-        interpolated_array = np.zeros(self.ip.resolution[0])
-
-        for i in range(n_segments):
-            interpolated_array[
-                int(res / n_segments) * i : int(res / n_segments * i + res / n_segments)
-            ] = np.linspace(
-                regional_values[i], regional_values[(i + 1) % n_segments], int(res / n_segments)
-            )
-
-        return interpolated_array
-
-    @staticmethod
-    def _basal_mid(basal: np.ndarray, mid: np.ndarray) -> np.ndarray:
-        """
-        :return: Helper array for better basal segments visualization
-        """
-        return (basal * 3 + mid) / 4
-
-    def _interpolate_17_aha_values_along_circle(self):
-        """
-        Interpolate the initial 17 values, to achieve smooth transition among segments.
-        """
-        basal = self._interpolate_directions(self.segmental_values[:6])
-        mid = self._interpolate_directions(self.segmental_values[6:12])
-        apex_mid = self._interpolate_directions(self.segmental_values[12:16])
-        apex = np.repeat(self.segmental_values[16], self.ip.resolution[0])
-        return basal, mid, apex_mid, apex
-
-    def _interpolate_18_aha_values_along_circle(self):
-        """
-        Interpolate the initial 18 values, to achieve smooth transition among segments.
-        """
-        basal = self._interpolate_directions(self.segmental_values[:6])
-        mid = self._interpolate_directions(self.segmental_values[6:12])
-        apex_mid = self._interpolate_directions(self.segmental_values[12:])
-        apex = np.repeat(np.sum(self.segmental_values[12:]) / 6, self.ip.resolution[0])
-        return basal, mid, apex_mid, apex
-
-    def interpolate_aha_values(self):
-        if self._n_segments == 17:
-            interp_func = self._interpolate_17_aha_values_along_circle
-        else:
-            interp_func = self._interpolate_18_aha_values_along_circle
-
-        # Set up the circular interpolation matrices
-        basal, mid, apex_mid, apex = interp_func()
-        along_x = np.array([basal, self._basal_mid(basal, mid), mid, apex_mid, apex])
-
-        # Adjust to visualisation
-        along_x = np.roll(along_x, int(self.ip.resolution[0] / 4), axis=1)
-        along_x = np.flip(along_x, 0)
-
-        # Interpolate along the radius
-        f = interp1d(self.ip.plot_levels, along_x, axis=0)
-        along_x_y = f(np.linspace(0, 1, self.ip.resolution[1]))
-
-        return along_x_y
 
 
 class AHAPlotting:
@@ -128,7 +41,7 @@ class AHAPlotting:
 
         self.theta = np.linspace(0, 2 * np.pi, self.ip.resolution[0])
 
-        ai = AHAInterpolation(self.segment_values)
+        ai = aha_interpolation.AHAInterpolation(self.segment_values)
         self._interpolated_segment_values: np.ndarray = ai.interpolate_aha_values()
 
         self.fig, self.ax = plt.subplots(
