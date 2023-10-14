@@ -1,0 +1,24 @@
+{
+    "strain": {
+        "cmap": "seismic_r",
+        "tick_values": [
+            -30,
+            30
+        ],
+        "n_bins": 12,
+        "units": "%",
+        "smooth_contour": true,
+        "title": "Myocardial strain",
+        "clip_boundary_norm": true
+    },
+    "myocardial_work": {
+        "cmap": "rainbow",
+        "norm_values": [
+            1000,
+            3000
+        ],
+        "units": "mmHg%",
+        "smooth_contour": false,
+        "title": "Myocardial work index"
+    }
+}
