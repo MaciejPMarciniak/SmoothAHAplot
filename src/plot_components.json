@@ -7,6 +7,12 @@
         768,
         100
     ],
+    "values_style": {
+        "fontsize": 20,
+        "ha": "center",
+        "va": "center",
+        "color": "w"
+    },
     "segment_name_style": {
         "fontsize": 20,
         "ha": "center",

@@ -2,8 +2,8 @@ import matplotlib.patheffects as pef
 import numpy as np
 
 
-class PlotStyle:
-    _aha_bounds = {17: np.linspace(0.2, 1, 4), 18: np.linspace(0.38, 1, 3)}
+class Style:
+    """Class for validating the style of the plot"""
 
     _values_style = {
         "fontsize": 20,
@@ -21,11 +21,20 @@ class PlotStyle:
         "color": "k",
     }
 
-    _segment_border_style = {
-        "linewidth": 2,
-        "linestyle": "-",
-        "color": "k",
-    }
+    @property
+    def values_style(self):
+        return self._values_style
+
+    @property
+    def segment_name_style(self):
+        return self._segment_name_style
+
+
+class Alignment:
+    """Class with functions used for aligning angles in the plot"""
+
+    _segment_alignment_angle = 90
+    _aha_bounds = {17: np.linspace(0.2, 1, 4), 18: np.linspace(0.38, 1, 3)}
 
     _positional_parameters = {
         "segment_name_orientations": (0, 60, -60, 0, 60, -60),
@@ -34,32 +43,16 @@ class PlotStyle:
     }
 
     @property
-    def values_style(self):
-        return self._values_style
-
-    @property
-    def positional_parameters(self):
-        return self._positional_parameters
-
-    @property
-    def segment_name_style(self):
-        return self._segment_name_style
+    def seg_align(self):
+        return self._segment_alignment_angle
 
     @property
     def aha_bounds(self):
         return self._aha_bounds
 
     @property
-    def segment_border_style(self):
-        return self._segment_border_style
-
-
-class PlotUtil:
-    _segment_alignment_angle = 90
-
-    @property
-    def seg_align(self):
-        return self._segment_alignment_angle
+    def positional_parameters(self):
+        return self._positional_parameters
 
     @staticmethod
     def _shift_by_60(x: int) -> int:

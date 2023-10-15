@@ -78,16 +78,80 @@ class AHAPlotting:
     def interpolated_segment_values(self):
         return self._interpolated_segment_values
 
+    # def _write_segment_names(self):
+    #     for wall in range(len(parameters.AHA_SEGMENT_NAMES["walls"])):
+    #         segment_name_direction = np.deg2rad(
+    #             self.pu.annotation_shift_functions[len(parameters.AHA_SEGMENT_NAMES["walls"])](wall)
+    #         )
+    #         segment_name_position = (
+    #             self.ip.radial_position[-1]
+    #             + self.ps.positional_parameters["segment_names_position"]
+    #         )
+    #         segment_name = parameters.AHA_SEGMENT_NAMES["walls"][wall]
+    #         segment_name_orientation = self.ps.positional_parameters["segment_name_orientations"][
+    #             wall
+    #         ]
+
+    #         self.ax.text(
+    #             x=segment_name_direction,
+    #             y=segment_name_position,
+    #             s=segment_name,
+    #             rotation=segment_name_orientation,
+    #             **self.ps.segment_name_style,
+    #         )
+
+    # def _draw_radial_bounds(self):
+    #     for radial_bound in range(self.ps.aha_bounds[self.n_segments].shape[0]):
+    #         self.ax.plot(
+    #             self.theta,
+    #             np.repeat(self.ps.aha_bounds[self.n_segments][radial_bound], self.theta.shape),
+    #             **self.ps.segment_border_style,
+    #         )
+
+    # def _draw_bounds(self, inner: float, outer: float, n_borders: int):
+    #     assert 0 <= inner <= 1, f"Inner starting point value must be between 0 and 1 (is {inner})"
+    #     assert 0 <= outer <= 1, f"Outer starting point value must be between 0 and 1 (is {outer})"
+    #     assert inner < outer, f"Inner ({inner}) cannot be greater than outer ({outer})"
+    #     assert n_borders in (4, 6), (
+    #         f"Only 4 or 6 borders between segments are allowed ({n_borders} " f"provided)"
+    #     )
+
+    #     shift_function = self.pu.border_shift_functions[n_borders]
+
+    #     for segment_border in range(n_borders):
+    #         border_orientation = np.deg2rad(shift_function(segment_border))
+    #         self.ax.plot(
+    #             [border_orientation, border_orientation],
+    #             [inner, outer],
+    #             **self.ps.segment_border_style,
+    #         )
+
+    # def _draw_outer_bounds(self):
+    #     self._draw_bounds(self.ps.aha_bounds[self._n_segments][1], 1, 6)
+
+    # def _draw_inner_bounds(self):
+    #     if self._n_segments == 17:
+    #         self._draw_bounds(
+    #             self.ps.aha_bounds[self._n_segments][0], self.ps.aha_bounds[self._n_segments][1], 4
+    #         )
+    #     else:
+    #         self._draw_bounds(0, self.ps.aha_bounds[self._n_segments][1], 6)
+
+    # def _draw_aha_bounds(self):
+    #     self._draw_radial_bounds()
+    #     self._draw_outer_bounds()
+    #     self._draw_inner_bounds()
+
     def _write_segment_names(self):
-        for wall in range(len(parameters.AHA_SEGMENT_NAMES["walls"])):
+        for wall in range(len(AHA_FEATURES["walls"])):
             segment_name_direction = np.deg2rad(
-                self.pu.annotation_shift_functions[len(parameters.AHA_SEGMENT_NAMES["walls"])](wall)
+                self.pu.annotation_shift_functions[len(AHA_FEATURES["walls"])](wall)
             )
             segment_name_position = (
                 self.ip.radial_position[-1]
                 + self.ps.positional_parameters["segment_names_position"]
             )
-            segment_name = parameters.AHA_SEGMENT_NAMES["walls"][wall]
+            segment_name = AHA_FEATURES["walls"][wall]
             segment_name_orientation = self.ps.positional_parameters["segment_name_orientations"][
                 wall
             ]
@@ -99,48 +163,6 @@ class AHAPlotting:
                 rotation=segment_name_orientation,
                 **self.ps.segment_name_style,
             )
-
-    def _draw_radial_bounds(self):
-        for radial_bound in range(self.ps.aha_bounds[self.n_segments].shape[0]):
-            self.ax.plot(
-                self.theta,
-                np.repeat(self.ps.aha_bounds[self.n_segments][radial_bound], self.theta.shape),
-                **self.ps.segment_border_style,
-            )
-
-    def _draw_bounds(self, inner: float, outer: float, n_borders: int):
-        assert 0 <= inner <= 1, f"Inner starting point value must be between 0 and 1 (is {inner})"
-        assert 0 <= outer <= 1, f"Outer starting point value must be between 0 and 1 (is {outer})"
-        assert inner < outer, f"Inner ({inner}) cannot be greater than outer ({outer})"
-        assert n_borders in (4, 6), (
-            f"Only 4 or 6 borders between segments are allowed ({n_borders} " f"provided)"
-        )
-
-        shift_function = self.pu.border_shift_functions[n_borders]
-
-        for segment_border in range(n_borders):
-            border_orientation = np.deg2rad(shift_function(segment_border))
-            self.ax.plot(
-                [border_orientation, border_orientation],
-                [inner, outer],
-                **self.ps.segment_border_style,
-            )
-
-    def _draw_outer_bounds(self):
-        self._draw_bounds(self.ps.aha_bounds[self._n_segments][1], 1, 6)
-
-    def _draw_inner_bounds(self):
-        if self._n_segments == 17:
-            self._draw_bounds(
-                self.ps.aha_bounds[self._n_segments][0], self.ps.aha_bounds[self._n_segments][1], 4
-            )
-        else:
-            self._draw_bounds(0, self.ps.aha_bounds[self._n_segments][1], 6)
-
-    def _draw_aha_bounds(self):
-        self._draw_radial_bounds()
-        self._draw_outer_bounds()
-        self._draw_inner_bounds()
 
     def _annotate_segment(self, angle: float, position: float, value: Union[int, float]):
         self.ax.text(angle, position, value, **self.ps.values_style)

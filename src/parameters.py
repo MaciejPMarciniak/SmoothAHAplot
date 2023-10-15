@@ -15,57 +15,6 @@ AHA_FEATURES = load_parameters_from_json(p / "aha_features.json")
 BIOMARKER_FEATURES = load_parameters_from_json(p / "biomarker_features.json")
 PLOT_COMPONENTS = load_parameters_from_json(p / "plot_components.json")
 
-# pandas Series/dictionary must have following index/keys:
-AHA_SEGMENT_NAMES = {
-    17: [
-        "Basal Anterior",
-        "Basal Anteroseptal",
-        "Basal Inferoseptal",
-        "Basal Inferior",
-        "Basal Inferolateral",
-        "Basal Anterolateral",
-        "Mid Anterior",
-        "Mid Anteroseptal",
-        "Mid Inferoseptal",
-        "Mid Inferior",
-        "Mid Inferolateral",
-        "Mid Anterolateral",
-        "Apical Anterior",
-        "Apical Septal",
-        "Apical Inferior",
-        "Apical Lateral",
-        "Apex",
-    ],
-    18: [
-        "Basal Anterior",
-        "Basal Anteroseptal",
-        "Basal Inferoseptal",
-        "Basal Inferior",
-        "Basal Inferolateral",
-        "Basal Anterolateral",
-        "Mid Anterior",
-        "Mid Anteroseptal",
-        "Mid Inferoseptal",
-        "Mid Inferior",
-        "Mid Inferolateral",
-        "Mid Anterolateral",
-        "Apical Anterior",
-        "Apical Anteroseptal",
-        "Apical Inferoseptal",
-        "Apical Inferior",
-        "Apical Inferolateral",
-        "Apical Anterolateral",
-    ],
-    "walls": [
-        "Anterior",
-        "Anteroseptal",
-        "Inferoseptal",
-        "Inferior",
-        "Inferolateral",
-        "Anterolateral",
-    ],
-}
-
 
 class InterpolationParameters:
     """Set of parameters used for interpolation"""
