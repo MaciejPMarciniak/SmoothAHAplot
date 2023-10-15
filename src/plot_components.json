@@ -37,5 +37,9 @@
         ],
         "segment_names_direction": 90,
         "segment_names_position": 0.06
+    },
+    "bound_range": {
+        "outer": 1.0,
+        "inner": 0.0
     }
 }

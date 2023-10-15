@@ -34,7 +34,7 @@ class AHAInterpolation:
         basal, mid, apex_mid, apex = self._interpolate_values_along_circle()
         along_x = np.array([basal, self._basal_mid(basal, mid), mid, apex_mid, apex])
 
-        # Adjust to visualisation
+        # Adjust for correct visualisation
         along_x = np.roll(along_x, int(PLOT_COMPONENTS["resolution"][0] / 4), axis=1)
         along_x = np.flip(along_x, 0)
 
@@ -62,8 +62,14 @@ class AHAInterpolation:
 
     @staticmethod
     def _basal_mid(basal: NDArray, mid: NDArray) -> NDArray:
-        """
-        :return: Helper array for better basal segments visualization
+        """Helper array for better basal segments visualization
+
+        Args:
+            basal: Values at the basal segment
+            mid: Values at the mid segment
+
+        Returns:
+            Additional array used for interpolation
         """
         return (basal * 3 + mid) / 4
 

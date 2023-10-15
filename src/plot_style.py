@@ -34,6 +34,7 @@ class Alignment:
     """Class with functions used for aligning angles in the plot"""
 
     _segment_alignment_angle = 90
+
     _aha_bounds = {17: np.linspace(0.2, 1, 4), 18: np.linspace(0.38, 1, 3)}
 
     _positional_parameters = {

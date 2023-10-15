@@ -22,19 +22,18 @@ class BoundNumberError(BoundError):
 class AHAPlotBounds:
     """Class for drawing bounds of the plot"""
 
-    def __init__(self, segments: aha_segmental_values.AHASegmentalValues | list[float]) -> None:
+    def __init__(
+        self, segments: aha_segmental_values.AHASegmentalValues | list[float], ax: plt.Axes
+    ) -> None:
         self.segments = segments
-        self._theta: NDArray
+        self.ax = ax
 
+        self._theta: NDArray
         self.theta = np.linspace(0, 2 * np.pi, PLOT_COMPONENTS["resolution"][0])
+
         self._bounds = AHA_FEATURES[str(self.n_segments)]["bounds"]
 
         self.pu = src.plot_style.Alignment()
-
-        _, self.ax = plt.subplots(
-            figsize=(12, 8), nrows=1, ncols=1, subplot_kw={"projection": "polar"}
-        )
-        self.levels = None
 
     @property
     def segmental_values(self) -> list[float]:
@@ -54,7 +53,7 @@ class AHAPlotBounds:
     def theta(self, angles: np.ndarray):
         assert len(angles) == PLOT_COMPONENTS["resolution"][0], (
             f"Number of provided angle values {len(angles)} does not match the"
-            f" desired resolution {self.ip.resolution[0]}"
+            f" desired resolution {PLOT_COMPONENTS['resolution'][0]}"
         )
         self._theta = angles
 
@@ -72,16 +71,54 @@ class AHAPlotBounds:
             )
 
     def _draw_outer_bounds(self):
-        self._draw_bounds(self._bounds[1], 1, 6)
+        """Draws the outer bounds of the plot
+
+        Raises:
+            BoundValueError: If the value of the boundary exceeds the range
+        """
+        bound_start = self._bounds[1]
+        if (
+            not PLOT_COMPONENTS["bound_range"]["inner"]
+            <= bound_start
+            <= PLOT_COMPONENTS["bound_range"]["outer"]
+        ):
+            raise BoundValueError(
+                f"Inner starting point value must be between 0 and 1 (is {bound_start})"
+            )
+        bound_end = PLOT_COMPONENTS["bound_range"]["outer"]
+        self._draw_bounds(bound_start, bound_end, 6)
 
     def _draw_inner_bounds(self):
+        """Draws the inner bounds of the plot, depending on the number of segments
+
+        Raises:
+            BoundValueError: If the value of the boundary exceeds the range
+        """
+        bound_end = self._bounds[1]
+        if (
+            not PLOT_COMPONENTS["bound_range"]["inner"]
+            <= bound_end
+            <= PLOT_COMPONENTS["bound_range"]["outer"]
+        ):
+            raise BoundValueError(
+                f"Inner starting point value must be between 0 and 1 (is {bound_end})"
+            )
         if self.n_segments == 17:
-            self._draw_bounds(self._bounds[0], self._bounds[1], 4)
+            bound_start = self._bounds[0]
+            if (
+                not PLOT_COMPONENTS["bound_range"]["inner"]
+                <= bound_start
+                <= PLOT_COMPONENTS["bound_range"]["outer"]
+            ):
+                raise BoundValueError(
+                    f"Inner starting point value must be between 0 and 1 (is {bound_start})"
+                )
+            self._draw_bounds(bound_start, bound_end, 4)
         else:
-            self._draw_bounds(0, self._bounds[1], 6)
+            self._draw_bounds(PLOT_COMPONENTS["bound_range"]["inner"], bound_end, 6)
 
     def _draw_bounds(self, inner: float, outer: float, n_borders: int):
-        """Draws plot bounds in between levels.
+        """Draws segment bounds in between levels.
 
         Args:
             inner:
@@ -95,14 +132,6 @@ class AHAPlotBounds:
             BoundValueError: Thrown if the inner or outer levels are incorrect.
             BoundNumberError: Thrown if the wrong number of levels is provided.
         """
-        if not 0 <= inner <= 1:
-            raise BoundValueError(
-                f"Inner starting point value must be between 0 and 1 (is {inner})"
-            )
-        if not 0 <= outer <= 1:
-            raise BoundValueError(
-                f"Outer starting point value must be between 0 and 1 (is {outer})"
-            )
         if not inner < outer:
             raise BoundValueError(f"Inner ({inner}) cannot be greater than outer ({outer})")
         if not n_borders in (4, 6):
