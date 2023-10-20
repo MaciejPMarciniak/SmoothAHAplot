@@ -36,7 +36,8 @@
             -60
         ],
         "segment_names_direction": 90,
-        "segment_names_position": 0.06
+        "segment_names_position": 0.06,
+        "apical_position": 0.25
     },
     "bound_range": {
         "outer": 1.0,

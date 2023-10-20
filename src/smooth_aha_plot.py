@@ -142,6 +142,10 @@ class AHAPlotting:
     #     self._draw_outer_bounds()
     #     self._draw_inner_bounds()
 
+    # TODO: Separate annotations
+    # TODO: Separate coloring
+    # TODO: Create interactive widget
+
     def _write_segment_names(self):
         for wall in range(len(AHA_FEATURES["walls"])):
             segment_name_direction = np.deg2rad(

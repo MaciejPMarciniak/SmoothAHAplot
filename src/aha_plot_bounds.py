@@ -2,8 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy.typing import NDArray
 
-import src.plot_style
-import aha_segmental_values
+from src import plot_style, aha_segmental_values
 from src.parameters import AHA_FEATURES, PLOT_COMPONENTS
 
 
@@ -22,28 +21,29 @@ class BoundNumberError(BoundError):
 class AHAPlotBounds:
     """Class for drawing bounds of the plot"""
 
-    def __init__(
-        self, segments: aha_segmental_values.AHASegmentalValues | list[float], ax: plt.Axes
-    ) -> None:
-        self.segments = segments
+    def __init__(self, n_segments: int, ax: plt.Axes) -> None:
+        self._n_segments: int
+        self.n_segments = n_segments
         self.ax = ax
 
         self._theta: NDArray
         self.theta = np.linspace(0, 2 * np.pi, PLOT_COMPONENTS["resolution"][0])
 
-        self._bounds = AHA_FEATURES[str(self.n_segments)]["bounds"]
+        self._bounds = AHA_FEATURES[self.n_segments]["bounds"]
 
-        self.pu = src.plot_style.Alignment()
-
-    @property
-    def segmental_values(self) -> list[float]:
-        if isinstance(self.segments, list):
-            return self.segments
-        return list(self.segments.segmental_values())
+        self.pu = plot_style.Alignment()
 
     @property
     def n_segments(self) -> int:
-        return len(self.segments)
+        return str(self._n_segments)
+
+    @n_segments.setter
+    def n_segments(self, n: int) -> None:
+        if self.n not in (17, 18):
+            raise aha_segmental_values.SegmentSizeError(
+                f"Incorrect number of segmental values provided: {n=}. "
+                "Provide either 17 or 18 elements."
+            )
 
     @property
     def theta(self) -> np.ndarray:
@@ -103,7 +103,7 @@ class AHAPlotBounds:
             raise BoundValueError(
                 f"Inner starting point value must be between 0 and 1 (is {bound_end})"
             )
-        if self.n_segments == 17:
+        if self.n_segments == "17":
             bound_start = self._bounds[0]
             if (
                 not PLOT_COMPONENTS["bound_range"]["inner"]
@@ -136,7 +136,7 @@ class AHAPlotBounds:
             raise BoundValueError(f"Inner ({inner}) cannot be greater than outer ({outer})")
         if not n_borders in (4, 6):
             raise BoundNumberError(
-                f"Only 4 or 6 borders between segments are allowed ({n_borders} " f"provided)"
+                f"Only 4 or 6 borders between segments are allowed ({n_borders} provided)"
             )
 
         shift_function = self.pu.border_shift_functions[n_borders]
