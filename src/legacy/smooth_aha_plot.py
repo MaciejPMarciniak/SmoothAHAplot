@@ -1,13 +1,14 @@
 from typing import Union
 
-import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 
-from src import parameters, aha_interpolation
-from src.plot_style import PlotStyle, PlotUtil
+from src import aha_interpolation
+from src.parameters import parameters
+from utils.plot_style import PlotStyle, PlotUtil
 
 
 class AHAPlotting:
@@ -142,7 +143,6 @@ class AHAPlotting:
     #     self._draw_outer_bounds()
     #     self._draw_inner_bounds()
 
-    # TODO: Separate annotations
     # TODO: Separate coloring
     # TODO: Create interactive widget
 
@@ -168,77 +168,77 @@ class AHAPlotting:
                 **self.ps.segment_name_style,
             )
 
-    def _annotate_segment(self, angle: float, position: float, value: Union[int, float]):
-        self.ax.text(angle, position, value, **self.ps.values_style)
+    # def _annotate_segment(self, angle: float, position: float, value: Union[int, float]):
+    #     self.ax.text(angle, position, value, **self.ps.values_style)
 
-    @staticmethod
-    def _fix_negative_zero(value: Union[float, int]):
-        return 0 if np.abs(np.round(value, 1)) < 0.1 else int(value)
+    # @staticmethod
+    # def _fix_negative_zero(value: Union[float, int]):
+    #     return 0 if np.abs(np.round(value, 1)) < 0.1 else int(value)
 
-    def _get_annotation_angle(self, n_level_segments: int, segment: int):
-        return np.deg2rad(self.pu.annotation_shift_functions[n_level_segments](segment))
+    # def _get_annotation_angle(self, n_level_segments: int, segment: int):
+    #     return np.deg2rad(self.pu.annotation_shift_functions[n_level_segments](segment))
 
-    def _annotate_basal_segments(self):
-        n_level_segments = len(parameters.AHA_SEGMENT_NAMES["walls"])
-        for segment in range(n_level_segments):
-            angle = self._get_annotation_angle(n_level_segments, segment)
-            position = float(
-                np.mean(
-                    [
-                        self.ps.aha_bounds[self.n_segments][-2],
-                        self.ps.aha_bounds[self.n_segments][-1],
-                    ]
-                )
-            )
-            value = self._fix_negative_zero(self.segment_values[segment])
-            self._annotate_segment(angle, position, value)
+    # def _annotate_basal_segments(self):
+    #     n_level_segments = len(parameters.AHA_SEGMENT_NAMES["walls"])
+    #     for segment in range(n_level_segments):
+    #         angle = self._get_annotation_angle(n_level_segments, segment)
+    #         position = float(
+    #             np.mean(
+    #                 [
+    #                     self.ps.aha_bounds[self.n_segments][-2],
+    #                     self.ps.aha_bounds[self.n_segments][-1],
+    #                 ]
+    #             )
+    #         )
+    #         value = self._fix_negative_zero(self.segment_values[segment])
+    #         self._annotate_segment(angle, position, value)
 
-    def _annotate_mid_segments(self):
-        n_level_segments = len(parameters.AHA_SEGMENT_NAMES["walls"])
-        for segment in range(n_level_segments):
-            angle = self._get_annotation_angle(n_level_segments, segment)
-            position = float(
-                np.mean(
-                    [
-                        self.ps.aha_bounds[self.n_segments][-3],
-                        self.ps.aha_bounds[self.n_segments][-2],
-                    ]
-                )
-            )
-            value = self._fix_negative_zero(self.segment_values[segment + 6])
-            self._annotate_segment(angle, position, value)
+    # def _annotate_mid_segments(self):
+    #     n_level_segments = len(parameters.AHA_SEGMENT_NAMES["walls"])
+    #     for segment in range(n_level_segments):
+    #         angle = self._get_annotation_angle(n_level_segments, segment)
+    #         position = float(
+    #             np.mean(
+    #                 [
+    #                     self.ps.aha_bounds[self.n_segments][-3],
+    #                     self.ps.aha_bounds[self.n_segments][-2],
+    #                 ]
+    #             )
+    #         )
+    #         value = self._fix_negative_zero(self.segment_values[segment + 6])
+    #         self._annotate_segment(angle, position, value)
 
-    def _annotate_apical_segments(self):
-        if self._n_segments == 17:
-            n_level_segments = 4
-            for segment in range(n_level_segments):
-                angle = self._get_annotation_angle(n_level_segments, segment)
-                position = float(
-                    np.mean(
-                        [
-                            self.ps.aha_bounds[self.n_segments][0],
-                            self.ps.aha_bounds[self.n_segments][1],
-                        ]
-                    )
-                )
-                value = self._fix_negative_zero(self.segment_values[segment + 12])
-                self._annotate_segment(angle, position, value)
+    # def _annotate_apical_segments(self):
+    #     if self._n_segments == 17:
+    #         n_level_segments = 4
+    #         for segment in range(n_level_segments):
+    #             angle = self._get_annotation_angle(n_level_segments, segment)
+    #             position = float(
+    #                 np.mean(
+    #                     [
+    #                         self.ps.aha_bounds[self.n_segments][0],
+    #                         self.ps.aha_bounds[self.n_segments][1],
+    #                     ]
+    #                 )
+    #             )
+    #             value = self._fix_negative_zero(self.segment_values[segment + 12])
+    #             self._annotate_segment(angle, position, value)
 
-            angle = position = 0
-            value = self._fix_negative_zero(self.segment_values[-1])
-            self._annotate_segment(angle, position, value)
-        else:
-            n_level_segments = len(parameters.AHA_SEGMENT_NAMES["walls"])
-            for segment in range(n_level_segments):
-                angle = self._get_annotation_angle(n_level_segments, segment)
-                position = self.ip.apical_position
-                value = self._fix_negative_zero(self.segment_values[segment + 12])
-                self._annotate_segment(angle, position, value)
+    #         angle = position = 0
+    #         value = self._fix_negative_zero(self.segment_values[-1])
+    #         self._annotate_segment(angle, position, value)
+    #     else:
+    #         n_level_segments = len(parameters.AHA_SEGMENT_NAMES["walls"])
+    #         for segment in range(n_level_segments):
+    #             angle = self._get_annotation_angle(n_level_segments, segment)
+    #             position = self.ip.apical_position
+    #             value = self._fix_negative_zero(self.segment_values[segment + 12])
+    #             self._annotate_segment(angle, position, value)
 
-    def _annotate_aha_segments(self):
-        self._annotate_basal_segments()
-        self._annotate_mid_segments()
-        self._annotate_apical_segments()
+    # def _annotate_aha_segments(self):
+    #     self._annotate_basal_segments()
+    #     self._annotate_mid_segments()
+    #     self._annotate_apical_segments()
 
     def _clear_bullseye_plot(self):
         self.ax.set_yticklabels([])

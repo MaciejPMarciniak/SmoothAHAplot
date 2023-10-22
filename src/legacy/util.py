@@ -1,7 +1,7 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
-from parameters import AHA17Parameters
+from src.parameters.parameters import ANGULAR_COORDINATES
 
 
 def draw_interpolation_positions(levels: tuple[int, ...]) -> None:
@@ -9,15 +9,13 @@ def draw_interpolation_positions(levels: tuple[int, ...]) -> None:
     Show interpolation levels on the plot
     """
     _, ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=1, subplot_kw={"projection": "polar"})
-    ip = AHA17Parameters()
 
     r = levels
-    theta = np.linspace(0, 2 * np.pi, ip.resolution[0])
     linewidth = 2
 
     # Create the radial bounds
     for i in range(r.shape[0]):
-        ax.plot(theta, np.repeat(r[i], theta.shape), "-k", lw=linewidth)
+        ax.plot(ANGULAR_COORDINATES, np.repeat(r[i], ANGULAR_COORDINATES.shape), "-k", lw=linewidth)
 
     # Create the bounds for the segments 1-12
     for i in range(6):

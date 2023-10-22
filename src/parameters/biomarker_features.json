@@ -7,9 +7,7 @@
         ],
         "n_bins": 12,
         "units": "%",
-        "smooth_contour": true,
-        "title": "Myocardial strain",
-        "clip_boundary_norm": true
+        "title": "Myocardial strain"
     },
     "myocardial_work": {
         "cmap": "rainbow",
@@ -18,7 +16,6 @@
             3000
         ],
         "units": "mmHg%",
-        "smooth_contour": false,
         "title": "Myocardial work index"
     }
 }

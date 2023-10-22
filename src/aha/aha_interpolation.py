@@ -2,8 +2,8 @@ import numpy as np
 from numpy.typing import NDArray
 from scipy.interpolate import interp1d
 
-import aha_segmental_values
-from parameters import AHA_FEATURES, PLOT_COMPONENTS
+from src.aha import aha_segmental_values
+from src.parameters.parameters import AHA_FEATURES, PLOT_COMPONENTS
 
 # TODO: Remove handling lists in segmental_values
 
@@ -11,14 +11,16 @@ from parameters import AHA_FEATURES, PLOT_COMPONENTS
 class AHAInterpolation:
     """Class to interpolate provided values for smoothed plots."""
 
-    def __init__(self, segments: aha_segmental_values.AHASegmentalValues | list[float]) -> None:
+    def __init__(
+        self, segments: aha_segmental_values.AHASegmentalValues | list[float | int]
+    ) -> None:
         self.segments = segments
 
     @property
-    def segmental_values(self) -> list[float]:
+    def segmental_values(self) -> list[float | int]:
         if isinstance(self.segments, list):
             return self.segments
-        return list(self.segments.segmental_values())
+        return list(self.segments.segmental_values)
 
     @property
     def n_segments(self) -> int:
@@ -46,7 +48,10 @@ class AHAInterpolation:
 
     def _interpolate_values_along_circle(self) -> tuple[NDArray, ...]:
         """
-        Interpolate the initial 17 values, to achieve smooth transition among segments.
+        Interpolate the initial values, to achieve smooth transition among segments.
+
+        Returns:
+            Interpolated values around the radial direction.
         """
         basal = self._interpolate_directions(self.segmental_values[:6])
         mid = self._interpolate_directions(self.segmental_values[6:12])
@@ -73,8 +78,8 @@ class AHAInterpolation:
         """
         return (basal * 3 + mid) / 4
 
-    def _interpolate_directions(self, regional_values: list[int]) -> NDArray:
-        """Interpolates values in between provided values with set resolution.
+    def _interpolate_directions(self, regional_values: list[float | int]) -> NDArray:
+        """Interpolates provided values with set resolution.
 
         Args:
             regional_values: Values between which the interpolation occurs.

@@ -1,8 +1,8 @@
-from src.smooth_aha_plot import AHAPlotting
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 
+from legacy.smooth_aha_plot import AHAPlotting
 
 exp_strain_data = [
     -13,

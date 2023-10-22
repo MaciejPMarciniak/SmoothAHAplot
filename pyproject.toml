@@ -14,8 +14,10 @@
 line-length = 100
 target-version = ["py311"]
 include = '''
- smooth_aha_plot.*py$|
+ src.*py$|
  '''
+[tool.isort]
+profile = "black"
 # ------------------------------------------------------------------------------
 
 # -----MYPY---------------------------------------------------------------------
@@ -43,9 +45,7 @@ exclude = ['build']
 
 # mypy per-mopdule options
 [[tool.mypy.overrides]]
-module = [
-    "smooth_aha_plot.*",
-]
+module = ["src.*"]
 ignore_errors = false
 disallow_untyped_defs = true
 

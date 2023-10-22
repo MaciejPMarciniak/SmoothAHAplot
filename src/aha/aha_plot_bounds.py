@@ -1,9 +1,9 @@
-import numpy as np
 import matplotlib.pyplot as plt
-from numpy.typing import NDArray
+import numpy as np
 
-from src import plot_style, aha_segmental_values
-from src.parameters import AHA_FEATURES, PLOT_COMPONENTS
+from aha import aha_segmental_values
+from parameters.parameters import AHA_FEATURES, ANGULAR_COORDINATES, PLOT_COMPONENTS
+from utils import plot_style
 
 
 class BoundError(ValueError):
@@ -22,55 +22,40 @@ class AHAPlotBounds:
     """Class for drawing bounds of the plot"""
 
     def __init__(self, n_segments: int, ax: plt.Axes) -> None:
-        self._n_segments: int
-        self.n_segments = n_segments
+        self._n_segments = n_segments
         self.ax = ax
-
-        self._theta: NDArray
-        self.theta = np.linspace(0, 2 * np.pi, PLOT_COMPONENTS["resolution"][0])
 
         self._bounds = AHA_FEATURES[self.n_segments]["bounds"]
 
         self.pu = plot_style.Alignment()
 
     @property
-    def n_segments(self) -> int:
+    def n_segments(self) -> str:
         return str(self._n_segments)
 
     @n_segments.setter
     def n_segments(self, n: int) -> None:
-        if self.n not in (17, 18):
+        if n not in (17, 18):
             raise aha_segmental_values.SegmentSizeError(
                 f"Incorrect number of segmental values provided: {n=}. "
                 "Provide either 17 or 18 elements."
             )
 
-    @property
-    def theta(self) -> np.ndarray:
-        return self._theta
-
-    @theta.setter
-    def theta(self, angles: np.ndarray):
-        assert len(angles) == PLOT_COMPONENTS["resolution"][0], (
-            f"Number of provided angle values {len(angles)} does not match the"
-            f" desired resolution {PLOT_COMPONENTS['resolution'][0]}"
-        )
-        self._theta = angles
-
-    def draw_aha_bounds(self):
+    def draw_aha_bounds(self) -> plt.Axes:
         self._draw_radial_bounds()
         self._draw_outer_bounds()
         self._draw_inner_bounds()
+        return self.ax
 
-    def _draw_radial_bounds(self):
+    def _draw_radial_bounds(self) -> None:
         for radial_bound in self._bounds:
             self.ax.plot(
-                self.theta,
-                np.repeat(float(radial_bound), self.theta.shape),
+                ANGULAR_COORDINATES,
+                np.repeat(float(radial_bound), ANGULAR_COORDINATES.shape),
                 **PLOT_COMPONENTS["segment_border_style"],
             )
 
-    def _draw_outer_bounds(self):
+    def _draw_outer_bounds(self) -> None:
         """Draws the outer bounds of the plot
 
         Raises:
@@ -88,7 +73,7 @@ class AHAPlotBounds:
         bound_end = PLOT_COMPONENTS["bound_range"]["outer"]
         self._draw_bounds(bound_start, bound_end, 6)
 
-    def _draw_inner_bounds(self):
+    def _draw_inner_bounds(self) -> None:
         """Draws the inner bounds of the plot, depending on the number of segments
 
         Raises:
@@ -117,7 +102,7 @@ class AHAPlotBounds:
         else:
             self._draw_bounds(PLOT_COMPONENTS["bound_range"]["inner"], bound_end, 6)
 
-    def _draw_bounds(self, inner: float, outer: float, n_borders: int):
+    def _draw_bounds(self, inner: float, outer: float, n_borders: int) -> None:
         """Draws segment bounds in between levels.
 
         Args:
