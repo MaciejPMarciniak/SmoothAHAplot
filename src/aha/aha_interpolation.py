@@ -2,8 +2,8 @@ import numpy as np
 from numpy.typing import NDArray
 from scipy.interpolate import interp1d
 
-from src.aha import aha_segmental_values
-from src.parameters.parameters import AHA_FEATURES, PLOT_COMPONENTS
+from aha import aha_segmental_values
+from parameters.parameters import AHA_FEATURES, PLOT_COMPONENTS
 
 # TODO: Remove handling lists in segmental_values
 
@@ -11,15 +11,11 @@ from src.parameters.parameters import AHA_FEATURES, PLOT_COMPONENTS
 class AHAInterpolation:
     """Class to interpolate provided values for smoothed plots."""
 
-    def __init__(
-        self, segments: aha_segmental_values.AHASegmentalValues | list[float | int]
-    ) -> None:
+    def __init__(self, segments: aha_segmental_values.AHASegmentalValues) -> None:
         self.segments = segments
 
     @property
     def segmental_values(self) -> list[float | int]:
-        if isinstance(self.segments, list):
-            return self.segments
         return list(self.segments.segmental_values)
 
     @property

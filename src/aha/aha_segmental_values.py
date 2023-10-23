@@ -1,7 +1,7 @@
 import pydantic
 from loguru import logger
 
-from src.parameters.parameters import AHA_FEATURES
+from parameters.parameters import AHA_FEATURES
 
 
 class SegmentsError(AttributeError):

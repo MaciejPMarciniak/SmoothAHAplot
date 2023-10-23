@@ -39,7 +39,31 @@ class AHAAnnotation:
         self._annotate_basal_segments()
         self._annotate_mid_segments()
         self._annotate_apical_segments()
+        self._write_segment_names()
         return self.ax
+
+    def _write_segment_names(self) -> None:
+        """Writes the name of the segment (wall) names around the plot."""
+        for wall in range(len(AHA_FEATURES["walls"])):
+            segment_name_direction = np.deg2rad(
+                self.align.annotation_shift_functions[len(AHA_FEATURES["walls"])](wall)
+            )
+            segment_name_position = (
+                PLOT_COMPONENTS["bound_range"]["outer"]
+                + PLOT_COMPONENTS["positional_parameters"]["segment_names_position"]
+            )
+            segment_name = AHA_FEATURES["walls"][wall]
+            segment_name_orientation = PLOT_COMPONENTS["positional_parameters"][
+                "segment_name_orientations"
+            ][wall]
+
+            self.ax.text(
+                x=segment_name_direction,
+                y=segment_name_position,
+                s=segment_name,
+                rotation=segment_name_orientation,
+                **PLOT_COMPONENTS["segment_name_style"],
+            )
 
     def _annotate_basal_segments(self) -> None:
         """Inserts the biomarker values in the basal segments."""

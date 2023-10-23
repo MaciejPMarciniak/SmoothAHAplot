@@ -42,5 +42,17 @@
     "bound_range": {
         "outer": 1.0,
         "inner": 0.0
+    },
+    "colorbar": {
+        "axes": [
+            0.05,
+            0.1,
+            0.2,
+            0.05
+        ],
+        "orientation": "horizontal",
+        "label_size": 16,
+        "tick_size": 14,
+        "tick_marks": "major"
     }
 }

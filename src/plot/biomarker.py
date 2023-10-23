@@ -25,7 +25,7 @@ class Biomarker:
         )
 
     @property
-    def feature(self) -> str:
+    def biomarker_name(self) -> str:
         return ""
 
     @property
@@ -34,15 +34,15 @@ class Biomarker:
 
     @property
     def cmap(self) -> plt.Colormap:
-        return plt.get_cmap(BIOMARKER_FEATURES[self.feature]["cmap"])
+        return plt.get_cmap(BIOMARKER_FEATURES[self.biomarker_name]["cmap"])
 
     @property
     def units(self) -> str:
-        return ""
+        return BIOMARKER_FEATURES[self.biomarker_name]["units"]
 
     @property
     def title(self) -> str:
-        return BIOMARKER_FEATURES[self.feature]["title"]
+        return BIOMARKER_FEATURES[self.biomarker_name]["title"]
 
     @property
     def extended_radial_coordinates(self) -> NDArray:
@@ -51,6 +51,14 @@ class Biomarker:
     @property
     def extended_angular_coordinates(self) -> NDArray:
         return self._extended_angular_coordinates
+
+    def color_plot(self, ax: plt.Axes, interpolated_segment_values: NDArray) -> plt.Axes:
+        """Virtual function with unused arguments."""
+        _ = (
+            ax,
+            interpolated_segment_values,
+        )
+        return ax
 
 
 def validate_resolution(func: Callable) -> Callable:

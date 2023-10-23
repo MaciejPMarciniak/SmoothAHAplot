@@ -143,30 +143,7 @@ class AHAPlotting:
     #     self._draw_outer_bounds()
     #     self._draw_inner_bounds()
 
-    # TODO: Separate coloring
     # TODO: Create interactive widget
-
-    def _write_segment_names(self):
-        for wall in range(len(AHA_FEATURES["walls"])):
-            segment_name_direction = np.deg2rad(
-                self.pu.annotation_shift_functions[len(AHA_FEATURES["walls"])](wall)
-            )
-            segment_name_position = (
-                self.ip.radial_position[-1]
-                + self.ps.positional_parameters["segment_names_position"]
-            )
-            segment_name = AHA_FEATURES["walls"][wall]
-            segment_name_orientation = self.ps.positional_parameters["segment_name_orientations"][
-                wall
-            ]
-
-            self.ax.text(
-                x=segment_name_direction,
-                y=segment_name_position,
-                s=segment_name,
-                rotation=segment_name_orientation,
-                **self.ps.segment_name_style,
-            )
 
     # def _annotate_segment(self, angle: float, position: float, value: Union[int, float]):
     #     self.ax.text(angle, position, value, **self.ps.values_style)
@@ -239,54 +216,6 @@ class AHAPlotting:
     #     self._annotate_basal_segments()
     #     self._annotate_mid_segments()
     #     self._annotate_apical_segments()
-
-    def _clear_bullseye_plot(self):
-        self.ax.set_yticklabels([])
-        self.ax.set_xticklabels([])
-        self.ax.set_ylim([0, 1])
-        self.ax.grid(None)
-
-    def _normalize_data(self, norm: Union[BoundaryNorm, tuple[int, int]] | None = None):
-        if norm is None:
-            norm = mpl.colors.Normalize(
-                vmin=min(self.segment_values), vmax=max(self.segment_values)
-            )
-        elif isinstance(norm, tuple) and len(norm) == 2:
-            norm = mpl.colors.Normalize(vmin=norm[0], vmax=norm[1])
-        return norm
-
-    def _add_color_bar(self, units: str = "Units", cmap: str = "jet", norm=None):
-        bar = self.fig.add_axes([0.05, 0.1, 0.2, 0.05])
-        cb1 = mpl.colorbar.ColorbarBase(bar, cmap=cmap, norm=norm, orientation="horizontal")
-        cb1.set_label(units, size=16)
-        cb1.ax.tick_params(labelsize=14, which="major")
-
-    def _color_plot(self, cmap: str = "jet", norm=None, smooth_contour=False):
-        extended_radial_position = np.repeat(
-            self.ip.radial_position[:, np.newaxis], self.ip.resolution[0], axis=1
-        ).T
-        extended_radial_angle = np.repeat(
-            self.theta[:, np.newaxis], extended_radial_position.shape[1], axis=1
-        )
-        ravelled_segment_values = np.array(self.interpolated_segment_values).T
-
-        if smooth_contour:
-            levels = MaxNLocator(nbins=12).tick_values(-30, 30)
-            self.ax.contourf(
-                extended_radial_angle,
-                extended_radial_position,
-                ravelled_segment_values,
-                cmap=cmap,
-                levels=levels,
-            )
-        else:
-            self.ax.pcolormesh(
-                extended_radial_angle,
-                extended_radial_position,
-                ravelled_segment_values,
-                cmap=cmap,
-                norm=norm,
-            )
 
     def bullseye_smooth(
         self,

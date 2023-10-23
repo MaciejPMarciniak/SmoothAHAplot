@@ -1,15 +1,15 @@
-import numpy as np
 from matplotlib import colors, pyplot, ticker
+from numpy.typing import NDArray
 
-from src.coloring import biomarker
-from src.parameters.parameters import BIOMARKER_FEATURES
+from parameters.parameters import BIOMARKER_FEATURES
+from plot import biomarker
 
 
 class Strain(biomarker.Biomarker):
     """Class for coloring the AHA plot with strain values"""
 
     @property
-    def feature(self) -> str:
+    def biomarker_name(self) -> str:
         return "strain"
 
     @property
@@ -18,17 +18,13 @@ class Strain(biomarker.Biomarker):
         return norm
 
     @property
-    def units(self) -> str:
-        return "%"
-
-    @property
     def levels(self) -> ticker.MaxNLocator:
-        nbins = BIOMARKER_FEATURES[self.feature]["n_bins"]
-        tick_values = BIOMARKER_FEATURES[self.feature]["tick_values"]
+        nbins = BIOMARKER_FEATURES[self.biomarker_name]["n_bins"]
+        tick_values = BIOMARKER_FEATURES[self.biomarker_name]["tick_values"]
         return ticker.MaxNLocator(nbins=nbins).tick_values(**tick_values)
 
     @biomarker.validate_resolution
-    def color_plot(self, ax: pyplot.Axes, interpolated_segment_values: np.array) -> pyplot.Axes:
+    def color_plot(self, ax: pyplot.Axes, interpolated_segment_values: NDArray) -> pyplot.Axes:
         """Color plot according to the strain visualisation guidelines.
 
         Args:

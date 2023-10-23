@@ -1,29 +1,25 @@
-import numpy as np
 from matplotlib import colors, pyplot
+from numpy.typing import NDArray
 
-from src.coloring import biomarker
-from src.parameters.parameters import BIOMARKER_FEATURES
+from parameters.parameters import BIOMARKER_FEATURES
+from plot import biomarker
 
 
 class MyocardialWork(biomarker.Biomarker):
     """Class for coloring the AHA plot with myocardial work values"""
 
     @property
-    def feature(self) -> str:
+    def biomarker_name(self) -> str:
         return "myocardial_work"
 
     @property
     def norm(self) -> tuple[int, int]:
-        norm = tuple(BIOMARKER_FEATURES[self.feature]["norm"])
+        norm = tuple(BIOMARKER_FEATURES[self.biomarker_name]["norm"])
         normalized_norm = colors.Normalize(vmin=norm[0], vmax=norm[1])
         return normalized_norm
 
-    @property
-    def units(self) -> str:
-        return "mmHg%"
-
     @biomarker.validate_resolution
-    def color_plot(self, ax: pyplot.Axes, interpolated_segment_values: np.array) -> pyplot.Axes:
+    def color_plot(self, ax: pyplot.Axes, interpolated_segment_values: NDArray) -> pyplot.Axes:
         """Color plot according to the myocardial work visualisation guidelines.
 
         Args:
