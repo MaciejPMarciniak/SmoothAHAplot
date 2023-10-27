@@ -1,7 +1,7 @@
 import pydantic
 from loguru import logger
 
-from parameters.parameters import AHA_FEATURES
+from src.parameters.parameters import AHA_FEATURES
 
 
 class SegmentsError(AttributeError):
@@ -30,9 +30,12 @@ class AHASegmentalValues(pydantic.BaseModel):
         self._segmental_values: list[int | float] = []
         self._parse_segmental_values()
 
+    def __len__(self) -> int:
+        return len(self.segmental_values)
+
     @pydantic.field_validator("segments")
     @classmethod
-    def segment_validator(cls) -> None:
+    def segment_validator(cls, value: dict) -> dict:
         """Validates provided segments
 
         Args:
@@ -44,24 +47,25 @@ class AHASegmentalValues(pydantic.BaseModel):
             SegmentsNameError: If the names of the segments are not the same as in JSON
         """
         try:
-            correct_segment_names = AHA_FEATURES[str(len(cls.segments))]["names"]
+            correct_segment_names = AHA_FEATURES[str(len(value))]["names"]
         except SegmentSizeError as err:
             raise SegmentsError(
                 logger.error(
-                    f"Incorrect number of segments provided: {len(cls.segments)=}. "
+                    f"Incorrect number of segments provided: {len(value)=}. "
                     "Provide either 17 or 18 segment values"
                 )
             ) from err
 
-        if len(correct_segment_names) != len(cls.segments):
+        if len(correct_segment_names) != len(value):
             raise SegmentSizeError(
                 f"Inconsistent number of segment values provided: {len(correct_segment_names)=} is"
-                f" different from {len(cls)=}. Provide correct number of segments."
+                f" different from {len(value)=}. Provide correct number of segments."
             )
 
-        for correct_name, field_name in zip(correct_segment_names, cls.segments):
+        for correct_name, field_name in zip(correct_segment_names, value):
             if field_name != correct_name:
                 raise SegmentsNameError(f"Incorrect segment name provided: {field_name}")
+        return value
 
     @property
     def segmental_values(self) -> list[float]:

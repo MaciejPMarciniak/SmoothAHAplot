@@ -1,82 +1,92 @@
-import matplotlib.pyplot as plt
-from matplotlib.colors import BoundaryNorm
-from matplotlib.ticker import MaxNLocator
+import pytest
 
-from legacy.smooth_aha_plot import AHAPlotting
+from src.aha import aha
 
-exp_strain_data = [
-    -13,
-    -14,
-    -16,
-    -20,
-    -19,
-    -18,
-    -19,
-    -23,
-    -19,
-    -21,
-    -20,
-    -20,
-    -23,
-    -22,
-    -28,
-    -25,
-    -26,
-]
-exp_mw_data = [
-    1926,
-    1525,
-    1673,
-    2048,
-    2325,
-    2200,
-    2197,
-    2014,
-    1982,
-    2199,
-    2431,
-    2409,
-    2554,
-    2961,
-    2328,
-    2329,
-    2288,
-]
 
-segments_17 = [
-    "Basal Anterior",
-    "Basal Anteroseptal",
-    "Basal Inferoseptal",
-    "Basal Inferior",
-    "Basal Inferolateral",
-    "Basal Anterolateral",
-    "Mid Anterior",
-    "Mid Anteroseptal",
-    "Mid Inferoseptal",
-    "Mid Inferior",
-    "Mid Inferolateral",
-    "Mid Anterolateral",
-    "Apical Anterior",
-    "Apical Septal",
-    "Apical Inferior",
-    "Apical Lateral",
-    "Apex",
-]
+@pytest.fixture
+def exp_strain_data() -> list[int]:
+    return [
+        -13,
+        -14,
+        -16,
+        -20,
+        -19,
+        -18,
+        -19,
+        -23,
+        -19,
+        -21,
+        -20,
+        -20,
+        -23,
+        -22,
+        -28,
+        -25,
+        -26,
+    ]
 
-strain_dict = {k: v for (k, v) in zip(segments_17, exp_strain_data)}
-mw_dict = {k: v for (k, v) in zip(segments_17, exp_mw_data)}
 
-aha = AHAPlotting(values=exp_mw_data, plot_output_path="./images")
-cmap = plt.get_cmap("rainbow")
-norm = (1000, 3000)
-aha.bullseye_smooth(
-    cmap=cmap, norm=norm, title="Myocardial work index", units="mmHg%", smooth_contour=False
-)
-plt.show()
+@pytest.fixture
+def exp_mw_data() -> list[int]:
+    return [
+        1926,
+        1525,
+        1673,
+        2048,
+        2325,
+        2200,
+        2197,
+        2014,
+        1982,
+        2199,
+        2431,
+        2409,
+        2554,
+        2961,
+        2328,
+        2329,
+        2288,
+    ]
 
-aha = AHAPlotting(values=exp_strain_data, plot_output_path="./images")
-levels = MaxNLocator(nbins=12).tick_values(-30, 30)
-cmap = plt.get_cmap("seismic_r")
-norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
-aha.bullseye_smooth(cmap=cmap, norm=norm, units="%", smooth_contour=True)
-plt.show()
+
+@pytest.fixture
+def segments_17() -> list[str]:
+    return [
+        "Basal Anterior",
+        "Basal Anteroseptal",
+        "Basal Inferoseptal",
+        "Basal Inferior",
+        "Basal Inferolateral",
+        "Basal Anterolateral",
+        "Mid Anterior",
+        "Mid Anteroseptal",
+        "Mid Inferoseptal",
+        "Mid Inferior",
+        "Mid Inferolateral",
+        "Mid Anterolateral",
+        "Apical Anterior",
+        "Apical Septal",
+        "Apical Inferior",
+        "Apical Lateral",
+        "Apex",
+    ]
+
+
+@pytest.fixture
+def strain_dict(segments_17: list[int], exp_strain_data: list[int]) -> dict[str, int]:
+    return {k: v for (k, v) in zip(segments_17, exp_strain_data)}
+
+
+@pytest.fixture
+def mw_dict(segments_17: list[int], exp_mw_data: list[int]) -> dict[str, int]:
+    return {k: v for (k, v) in zip(segments_17, exp_mw_data)}
+
+
+def test_strain_plotting(strain_dict: dict[str, int]) -> None:
+    strain_plot = aha.AHA(strain_dict, "Strain")
+    strain_plot.bullseye_smooth(True)
+
+
+def test_mw_plotting(mw_dict: dict[str, int]) -> None:
+    mw_plot = aha.AHA(mw_dict, "MyocardialWork")
+    mw_plot.bullseye_smooth(True)

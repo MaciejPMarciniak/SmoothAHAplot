@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from typing import Callable
 
 import numpy as np
-from matplotlib import patheffects, pyplot
+from matplotlib import patheffects
+from matplotlib import pyplot as plt
 from numpy.typing import NDArray
 
 from aha import aha_segmental_values
@@ -9,12 +12,26 @@ from parameters.parameters import AHA_FEATURES, PLOT_COMPONENTS
 from utils import plot_style
 
 
+def correct_negative_zero(func: Callable) -> Callable:
+    """Removes a minus from annotation if value is close to 0.
+
+    Args:
+        func: Annotating function
+    """
+
+    def wrapper(self: AHAAnnotation, angle: float, position: float, value: float | int) -> None:
+        corrected_value = 0 if np.abs(np.round(value, 1)) < 0.1 else int(value)
+        return func(self, angle, position, corrected_value)
+
+    return wrapper
+
+
 class AHAAnnotation:
     """A class for annotation of the AHA plot with values of the biomarkers."""
 
-    def __init__(self, segments: aha_segmental_values.AHASegmentalValues, ax: pyplot.Axes) -> None:
+    def __init__(self, segments: aha_segmental_values.AHASegmentalValues, ax: plt.Axes) -> None:
         self.segments = segments
-        self.ax = ax
+        self._ax = ax
         self.align = plot_style.Alignment()
 
     @property
@@ -35,12 +52,12 @@ class AHAAnnotation:
         style["path_effects"] = self.values_style_effect
         return style
 
-    def annotate_aha_segments(self) -> pyplot.Axes:
+    def annotate_aha_segments(self) -> plt.Axes:
         self._annotate_basal_segments()
         self._annotate_mid_segments()
         self._annotate_apical_segments()
         self._write_segment_names()
-        return self.ax
+        return self._ax
 
     def _write_segment_names(self) -> None:
         """Writes the name of the segment (wall) names around the plot."""
@@ -57,7 +74,7 @@ class AHAAnnotation:
                 "segment_name_orientations"
             ][wall]
 
-            self.ax.text(
+            self._ax.text(
                 x=segment_name_direction,
                 y=segment_name_position,
                 s=segment_name,
@@ -73,7 +90,7 @@ class AHAAnnotation:
                 np.mean(
                     [
                         AHA_FEATURES[self.n_segments]["bounds"][-2],
-                        PLOT_COMPONENTS[self.n_segments]["bounds"][-1],
+                        AHA_FEATURES[self.n_segments]["bounds"][-1],
                     ]
                 )
             )
@@ -123,7 +140,7 @@ class AHAAnnotation:
 
     @correct_negative_zero
     def _annotate_segment(self, angle: float, position: float, value: int | float) -> None:
-        self.ax.text(angle, position, value, self.annotation_style)
+        self._ax.text(angle, position, value, self.annotation_style)
 
     def _get_annotation_angle(self, segment: int, angles: int | None = None) -> NDArray:
         if angles is None:
@@ -131,17 +148,3 @@ class AHAAnnotation:
 
         assert angles == 4, f"Inccorrect number of {angles=} provided."
         return np.deg2rad(self.align.annotation_shift_functions[angles](segment))
-
-
-def correct_negative_zero(func: Callable) -> Callable:
-    """Removes a minus from annotation if value is close to 0.
-
-    Args:
-        func: Annotating function
-    """
-
-    def wrapper(self: AHAAnnotation, angle: float, position: float, value: float | int) -> None:
-        corrected_value = 0 if np.abs(np.round(value, 1)) < 0.1 else int(value)
-        return func(self, angle, position, corrected_value)
-
-    return wrapper

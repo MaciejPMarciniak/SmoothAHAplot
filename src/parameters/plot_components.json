@@ -25,6 +25,10 @@
         "linestyle": "-",
         "color": "k"
     },
+    "title_style": {
+        "fontsize": 24,
+        "pad": 40
+    },
     "positional_parameters": {
         "segment_alignment_angle": 90,
         "segment_name_orientations": [
@@ -35,7 +39,6 @@
             60,
             -60
         ],
-        "segment_names_direction": 90,
         "segment_names_position": 0.06,
         "apical_position": 0.25
     },

@@ -9,7 +9,7 @@ def load_parameters_from_json(filename: Path) -> dict:
         return json.load(f)
 
 
-p = Path("src")
+p = Path("src") / "parameters"
 
 AHA_FEATURES = load_parameters_from_json(p / "aha_features.json")
 BIOMARKER_FEATURES = load_parameters_from_json(p / "biomarker_features.json")

@@ -2,11 +2,12 @@ from typing import Type
 
 import pydantic
 from loguru import logger
-from matplotlib import colorbar, pyplot
+from matplotlib import colorbar
+from matplotlib import pyplot as plt
 
 from aha import aha_interpolation, aha_segmental_values
 from parameters.parameters import BIOMARKER_FEATURES, PLOT_COMPONENTS
-from plot import biomarker
+from plot import biomarkers
 
 
 class BiomarkerError(NotImplementedError):
@@ -17,8 +18,9 @@ class AHAPlotting(pydantic.BaseModel):
     """Class for managing the plot components, including coloring,
     grid, ticks, labels, and title."""
 
-    ax: pyplot.Axes
-    fig: pyplot.Figure
+    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
+    ax: plt.Axes
+    fig: plt.Figure
     biomarker_name: str
 
     def __init__(self, **data: dict) -> None:
@@ -27,7 +29,7 @@ class AHAPlotting(pydantic.BaseModel):
 
     @pydantic.field_validator("biomarker_name")
     @classmethod
-    def biomarker_name_validator(cls) -> None:
+    def biomarker_name_validator(cls, value: dict) -> dict:
         """Asserts the biomarker coloring object exists
 
         Args:
@@ -36,30 +38,32 @@ class AHAPlotting(pydantic.BaseModel):
         Raises:
             BiomarkerError: If the biomarker handling class does not exist
         """
-        if cls.biomarker_name not in BIOMARKER_FEATURES.keys:
-            raise BiomarkerError(
-                logger.error(
-                    f"Plot settings for the biomarker {cls.biomarker_name} do not exist. "
-                    f"Available biomarkers: {BIOMARKER_FEATURES.keys}"
-                )
+        if value not in BIOMARKER_FEATURES.keys():
+            logger.error(
+                f"Plot settings for the biomarker {value} do not exist. "
+                f"Available biomarkers: {BIOMARKER_FEATURES.keys()}"
             )
+            raise BiomarkerError()
+        return value
 
-    @classmethod
-    def get_biomarker(cls) -> Type[biomarker.Biomarker]:
-        return [
+    def get_biomarker(self) -> Type[biomarkers.Biomarker]:
+        marker = [
             subclass
-            for subclass in biomarker.Biomarker.__subclasses__()
-            if subclass.biomarker_name == cls.biomarker_name
-        ][0]
+            for subclass in biomarkers.Biomarker.__subclasses__()
+            if subclass.__name__ == self.biomarker_name
+        ]
+        if marker:
+            logger.debug(f"Building '{marker[0].__name__}' handler")
+            return marker[0]()
+        raise BiomarkerError(f"No biomarker {self.biomarker_name} found")
 
-    def color_plot(
+    def create_plot(
         self,
         segments: aha_segmental_values.AHASegmentalValues,
-    ) -> pyplot.Axes:
+    ) -> plt.Axes:
         self._clear_bullseye_plot()
-        interpolator = aha_interpolation.AHAInterpolation(segments=segments)
-        interpolated_segment_values = interpolator.interpolate_aha_values()
-        self.ax = self._biomarker_handler.color_plot(self.ax, interpolated_segment_values)
+        self._set_title()
+        self._plot_interpolated_segmental_values(segments)
         return self.ax
 
     def _clear_bullseye_plot(self) -> None:
@@ -69,6 +73,23 @@ class AHAPlotting(pydantic.BaseModel):
             [PLOT_COMPONENTS["bound_range"]["inner"], PLOT_COMPONENTS["bound_range"]["outer"]]
         )
         self.ax.grid(None)
+
+    def _set_title(self) -> None:
+        self.ax.set_title(
+            BIOMARKER_FEATURES[self._biomarker_handler.__class__.__name__]["title"],
+            fontsize=PLOT_COMPONENTS["title_style"]["fontsize"],
+            pad=PLOT_COMPONENTS["title_style"]["pad"],
+        )
+
+    def _plot_interpolated_segmental_values(
+        self, segments: aha_segmental_values.AHASegmentalValues
+    ) -> None:
+        interpolator = aha_interpolation.AHAInterpolation(segments=segments)
+        interpolated_segment_values = interpolator.interpolate_aha_values()
+        self.ax = self._biomarker_handler.color_plot(
+            ax=self.ax,
+            interpolated_segment_values=interpolated_segment_values,
+        )
 
     def add_color_bar(self) -> None:
         """Adds the color bar with scale of the plot."""
