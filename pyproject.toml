@@ -113,12 +113,12 @@ testpaths = ["tests"]
 
 [tool.pylint.MAIN]
 
-# Files or directories to be skipped. They should be base names, not paths.
-ignore = []
+# Directories to be skipped.
+ignore-paths = ["legacy", "tests"]
 
 # Files or directories matching the regex patterns are skipped. The regex
 # matches against base names, not paths.
-ignore-patterns = ['test_(.)*\.py']
+# ignore-patterns = ['test(.)*\.py']
 
 # Pickle collected data for later comparisons.
 persistent = 'no'
