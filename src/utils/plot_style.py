@@ -9,7 +9,7 @@ class Alignment:
         return x * 60 + correction
 
     @staticmethod
-    def _shift_by_90(x: int, correction: int = 90) -> int:
+    def _shift_by_90(x: int, correction: int = 0) -> int:
         return x * 90 + correction
 
     @property

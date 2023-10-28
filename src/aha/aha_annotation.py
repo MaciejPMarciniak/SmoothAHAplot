@@ -149,4 +149,4 @@ class AHAAnnotation:
             )
 
         assert angles == 4, f"Inccorrect number of {angles=} provided."
-        return np.deg2rad(self.align.shift_functions[angles](segment))
+        return np.deg2rad(self.align.shift_functions[angles](segment, correction=90))
