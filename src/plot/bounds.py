@@ -124,10 +124,13 @@ class AHAPlotBounds:
                 f"Only 4 or 6 borders between segments are allowed ({n_borders} provided)"
             )
 
-        shift_function = self.pu.border_shift_functions[n_borders]
+        correction = PLOT_COMPONENTS["positional_parameters"]["border_angle_correction"][
+            str(n_borders)
+        ]
+        shift_function = self.pu.shift_functions[n_borders]
 
         for segment_border in range(n_borders):
-            border_orientation = np.deg2rad(shift_function(segment_border))
+            border_orientation = np.deg2rad(shift_function(segment_border, correction=correction))
             self.ax.plot(
                 [border_orientation, border_orientation],
                 [inner, outer],

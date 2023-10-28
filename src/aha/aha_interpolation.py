@@ -37,7 +37,12 @@ class AHAInterpolation:
         along_x = np.flip(along_x, 0)
 
         # Interpolate along the radius
-        interpolator = interp1d(AHA_FEATURES[str(self.n_segments)]["levels"], along_x, axis=0)
+        interpolator = interp1d(
+            AHA_FEATURES[str(self.n_segments)]["levels"],
+            along_x,
+            kind=PLOT_COMPONENTS["interpolation"]["kind"],
+            axis=0,
+        )
         along_x_y = interpolator(np.linspace(0, 1, PLOT_COMPONENTS["resolution"][1]))
 
         return along_x_y

@@ -67,5 +67,4 @@ class AHA:
         ax_plotting.create_plot(self.segments)
         if add_colorbar:
             ax_plotting.add_color_bar()
-        plt.show()
         return self.fig

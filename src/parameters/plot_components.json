@@ -4,9 +4,12 @@
         8
     ],
     "resolution": [
-        768,
-        100
+        384,
+        200
     ],
+    "interpolation": {
+        "kind": "slinear"
+    },
     "values_style": {
         "fontsize": 20,
         "ha": "center",
@@ -40,7 +43,11 @@
             -60
         ],
         "segment_names_position": 0.06,
-        "apical_position": 0.25
+        "apical_position": 0.25,
+        "border_angle_correction": {
+            "6": 0,
+            "4": 45
+        }
     },
     "bound_range": {
         "outer": 1.0,

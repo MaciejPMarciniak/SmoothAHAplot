@@ -63,7 +63,7 @@ class AHAAnnotation:
         """Writes the name of the segment (wall) names around the plot."""
         for wall in range(len(AHA_FEATURES["walls"])):
             segment_name_direction = np.deg2rad(
-                self.align.annotation_shift_functions[len(AHA_FEATURES["walls"])](wall)
+                self.align.shift_functions[len(AHA_FEATURES["walls"])](wall, correction=90)
             )
             segment_name_position = (
                 PLOT_COMPONENTS["bound_range"]["outer"]
@@ -144,7 +144,9 @@ class AHAAnnotation:
 
     def _get_annotation_angle(self, segment: int, angles: int | None = None) -> NDArray:
         if angles is None:
-            return np.deg2rad(self.align.annotation_shift_functions[self.n_segment_angles](segment))
+            return np.deg2rad(
+                self.align.shift_functions[self.n_segment_angles](segment, correction=90)
+            )
 
         assert angles == 4, f"Inccorrect number of {angles=} provided."
-        return np.deg2rad(self.align.annotation_shift_functions[angles](segment))
+        return np.deg2rad(self.align.shift_functions[angles](segment))
