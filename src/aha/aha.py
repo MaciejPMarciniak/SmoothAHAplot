@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 from loguru import logger
 
 from aha import aha_annotation, aha_segmental_values
-from parameters.parameters import PLOT_COMPONENTS
-from plot import bounds, plotting
+from aha.parameters.parameters import PLOT_COMPONENTS
+from aha.plot import bounds, plotting
 
 
 class AHA:

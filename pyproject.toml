@@ -70,6 +70,7 @@ loguru = "^0.7.2"
 tqdm = "^4.64.1"
 pylint = "^3.0.2"
 pydantic = ">=2.4.2"
+pyside6 = "^6.6.0"
 
 [tool.poetry.group.dev.dependencies]
 black = { extras = ["d"], version = ">=23.10.1" }

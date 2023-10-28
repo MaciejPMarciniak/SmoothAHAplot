@@ -3,9 +3,7 @@ from numpy.typing import NDArray
 from scipy.interpolate import interp1d
 
 from aha import aha_segmental_values
-from parameters.parameters import AHA_FEATURES, PLOT_COMPONENTS
-
-# TODO: Remove handling lists in segmental_values
+from aha.parameters.parameters import AHA_FEATURES, PLOT_COMPONENTS
 
 
 class AHAInterpolation:

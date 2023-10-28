@@ -8,8 +8,8 @@ from matplotlib import pyplot as plt
 from numpy.typing import NDArray
 
 from aha import aha_segmental_values
-from parameters.parameters import AHA_FEATURES, PLOT_COMPONENTS
-from utils import plot_style
+from aha.parameters.parameters import AHA_FEATURES, PLOT_COMPONENTS
+from aha.utils import plot_style
 
 
 def correct_negative_zero(func: Callable) -> Callable:
