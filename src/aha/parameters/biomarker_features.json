@@ -1,0 +1,21 @@
+{
+    "Strain": {
+        "cmap": "seismic_r",
+        "tick_values": [
+            -30,
+            30
+        ],
+        "n_bins": 12,
+        "units": "%",
+        "title": "Myocardial strain"
+    },
+    "MyocardialWork": {
+        "cmap": "rainbow",
+        "norm_values": [
+            1000,
+            3000
+        ],
+        "units": "mmHg%",
+        "title": "Myocardial work index"
+    }
+}
