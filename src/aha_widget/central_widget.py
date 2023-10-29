@@ -1,8 +1,12 @@
 import pandas as pd
-from PySide6.QtCharts import QChart, QChartView
-from PySide6.QtGui import QPainter
+from loguru import logger
+from matplotlib.backends.backend_qtagg import FigureCanvas
+from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.qt_compat import QtWidgets
 from PySide6.QtWidgets import QHBoxLayout, QHeaderView, QSizePolicy, QTableView, QWidget
 
+from aha import aha
+from aha.utils import data_mapping
 from aha_widget.table_model import CustomTableModel
 
 
@@ -27,13 +31,15 @@ class Widget(QWidget):
         self.horizontal_header.setStretchLastSection(True)
         self.table_view.verticalHeader().hide()
 
-        # Creating QChart
-        self.chart = QChart()
-        self.chart.setAnimationOptions(QChart.AllAnimations)
-
-        # Creating QChartView
-        self.chart_view = QChartView(self.chart)
-        self.chart_view.setRenderHint(QPainter.Antialiasing)
+        # AHA Plot
+        self.aha_plot = QtWidgets.QWidget()
+        self.layout = QtWidgets.QVBoxLayout(self.aha_plot)
+        logger.debug(data_mapping.case_to_dict(data, "Cid1"))
+        strain_plot = aha.AHA(data_mapping.case_to_dict(data, "Cid1"), "Strain")
+        fig = strain_plot.bullseye_smooth(True)
+        static_canvas = FigureCanvas(fig)
+        self.layout.addWidget(static_canvas)
+        self.layout.addWidget(NavigationToolbar(static_canvas, self))
 
         # QWidget Layout
         self.main_layout = QHBoxLayout()
@@ -46,8 +52,8 @@ class Widget(QWidget):
 
         ## Right Layout
         size.setHorizontalStretch(4)
-        self.chart_view.setSizePolicy(size)
-        self.main_layout.addWidget(self.chart_view)
+        self.aha_plot.setSizePolicy(size)
+        self.main_layout.addWidget(self.aha_plot)
 
         # Set the layout to the QWidget
         self.setLayout(self.main_layout)

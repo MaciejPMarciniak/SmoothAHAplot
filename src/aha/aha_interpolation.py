@@ -3,22 +3,23 @@ from numpy.typing import NDArray
 from scipy.interpolate import interp1d
 
 from aha import aha_segmental_values
-from aha.parameters.parameters import AHA_FEATURES, PLOT_COMPONENTS
+from aha.parameters.parameters import AHA_FEATURES, BIOMARKER_FEATURES, PLOT_COMPONENTS
 
 
 class AHAInterpolation:
     """Class to interpolate provided values for smoothed plots."""
 
-    def __init__(self, segments: aha_segmental_values.AHASegmentalValues) -> None:
-        self.segments = segments
+    def __init__(self, segments: aha_segmental_values.AHASegmentalValues, plot_type: str) -> None:
+        self._segments = segments
+        self._plot_type = plot_type
 
     @property
     def segmental_values(self) -> list[float | int]:
-        return list(self.segments.segmental_values)
+        return list(self._segments.segmental_values)
 
     @property
     def n_segments(self) -> int:
-        return len(self.segments)
+        return len(self._segments)
 
     def interpolate_aha_values(self) -> NDArray:
         """Interpolates values along vertical and horizontal axes of the plot.
@@ -42,7 +43,7 @@ class AHAInterpolation:
             axis=0,
         )
         along_x_y = interpolator(np.linspace(0, 1, PLOT_COMPONENTS["resolution"][1]))
-
+        along_x_y = self._normalize_excessive_values(along_x_y)
         return along_x_y
 
     def _interpolate_values_along_circle(self) -> tuple[NDArray, ...]:
@@ -76,6 +77,23 @@ class AHAInterpolation:
             Additional array used for interpolation
         """
         return (basal * 3 + mid) / 4
+
+    def _normalize_excessive_values(self, interpolated_data: NDArray) -> NDArray:
+        """Normalize the interpolated values to not exceed the plot coloring range.
+
+        Args:
+            interpolated_data : Data to be normalized.
+
+        Returns:
+            NDArray: Data within coloring range.
+        """
+        max_interpolated = max(BIOMARKER_FEATURES[self._plot_type]["norm_values"])
+        min_interpolated = min(BIOMARKER_FEATURES[self._plot_type]["norm_values"])
+
+        interpolated_data[interpolated_data > max_interpolated] = max_interpolated
+        interpolated_data[interpolated_data < min_interpolated] = min_interpolated
+
+        return interpolated_data
 
     def _interpolate_directions(self, regional_values: list[float | int]) -> NDArray:
         """Interpolates provided values with set resolution.

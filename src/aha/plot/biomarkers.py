@@ -96,7 +96,7 @@ class Strain(Biomarker):
     @property
     def levels(self) -> ticker.MaxNLocator:
         nbins = BIOMARKER_FEATURES[self.__class__.__name__]["n_bins"]
-        tick_values = BIOMARKER_FEATURES[self.__class__.__name__]["tick_values"]
+        tick_values = BIOMARKER_FEATURES[self.__class__.__name__]["norm_values"]
         return ticker.MaxNLocator(nbins=nbins).tick_values(*tick_values)
 
     @validate_resolution

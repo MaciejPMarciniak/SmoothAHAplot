@@ -1,7 +1,7 @@
 {
     "Strain": {
         "cmap": "seismic_r",
-        "tick_values": [
+        "norm_values": [
             -30,
             30
         ],

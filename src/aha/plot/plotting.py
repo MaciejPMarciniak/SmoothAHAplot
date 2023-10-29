@@ -84,7 +84,9 @@ class AHAPlotting(pydantic.BaseModel):
     def _plot_interpolated_segmental_values(
         self, segments: aha_segmental_values.AHASegmentalValues
     ) -> None:
-        interpolator = aha_interpolation.AHAInterpolation(segments=segments)
+        interpolator = aha_interpolation.AHAInterpolation(
+            segments=segments, plot_type=self._biomarker_handler.__class__.__name__
+        )
         interpolated_segment_values = interpolator.interpolate_aha_values()
         self.ax = self._biomarker_handler.color_plot(
             ax=self.ax,

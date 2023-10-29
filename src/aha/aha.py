@@ -57,6 +57,7 @@ class AHA:
             nrows=1,
             ncols=1,
             subplot_kw={"projection": "polar"},
+            layout="constrained",
         )
 
         ax_annotation = aha_annotation.AHAAnnotation(segments=self.segments, ax=self.ax)
@@ -67,4 +68,5 @@ class AHA:
         ax_plotting.create_plot(self.segments)
         if add_colorbar:
             ax_plotting.add_color_bar()
+
         return self.fig
