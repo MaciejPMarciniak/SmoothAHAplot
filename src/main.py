@@ -13,7 +13,7 @@ def main(filename: str = "") -> int:
     data = read_data.read_data(filename)
 
     app = QApplication(sys.argv)
-    widget = central_widget.Widget(data)
+    widget = central_widget.Widget(data, "Cid1")
     window = main_window.MainWindow(widget)
     window.show()
 

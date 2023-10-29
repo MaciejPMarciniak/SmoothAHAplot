@@ -13,20 +13,23 @@ class NoDataProvided(ValueError):
 class CustomTableModel(QAbstractTableModel):
     """Class holding the segment data table model"""
 
-    def __init__(self, data: pd.DataFrame | None = None):
+    def __init__(
+        self, data: pd.DataFrame | None = None, case_id: str | pd.Index | None = None
+    ) -> None:
         if data is None:
             raise NoDataProvided("Provide data with segmental values for the table")
         QAbstractTableModel.__init__(self)
+        self.case_id = case_id
+        logger.debug(self.case_id)
+
         self.load_data(data)
         self.segment_names = data.columns.to_numpy()
-        logger.debug(self.segment_names)
 
-    def load_data(self, data: pd.DataFrame, case_id: str = "Cid1") -> None:
-        self.segment_values = data.loc[case_id].values
+    def load_data(self, data: pd.DataFrame) -> None:
+        self.segment_values = data.loc[self.case_id].values
 
         self.column_count = 2
         self.row_count = len(self.segment_values)
-        logger.debug(self.row_count)
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int) -> Optional[str]:
         if role != Qt.DisplayRole:

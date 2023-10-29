@@ -10,7 +10,9 @@ class MainWindow(QMainWindow):
     def __init__(self, widget: central_widget.Widget) -> None:
         QMainWindow.__init__(self)
         self.setWindowTitle("Smooth AHA plot")
-        self.setCentralWidget(widget)
+        self.plot_widget = widget
+        self.plot_widget.setParent(self)
+        self.setCentralWidget(self.plot_widget)
 
         # Menu
         self.menu = self.menuBar()
