@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from loguru import logger
 
 from aha import aha_annotation, aha_segmental_values
 from aha.parameters.parameters import PLOT_COMPONENTS
@@ -25,7 +24,6 @@ class AHA:
         plot_type: str,
         plot_output_path: str = "",
     ):
-        logger.info(segments)
         self._segments = aha_segmental_values.AHASegmentalValues(segments=segments)
         self._plot_type = plot_type
         self._output_path = plot_output_path
@@ -68,5 +66,4 @@ class AHA:
         ax_plotting.create_plot(self.segments)
         if add_colorbar:
             ax_plotting.add_color_bar()
-
         return self.fig

@@ -1,20 +1,13 @@
 import sys
 
-import click
 from PySide6.QtWidgets import QApplication
 
-from aha_io import read_data
-from aha_widget import central_widget, main_window
+from aha_widget import main_window
 
 
-@click.command()
-@click.option("--filename", "-f", help="Name of the file with segment data.")
-def main(filename: str = "") -> int:
-    data = read_data.read_data(filename)
-
+def main() -> int:
     app = QApplication(sys.argv)
-    widget = central_widget.Widget(data, "Cid1")
-    window = main_window.MainWindow(widget)
+    window = main_window.MainWindow()
     window.show()
 
     sys.exit(app.exec())

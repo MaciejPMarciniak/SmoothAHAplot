@@ -1,0 +1,13 @@
+Case_ID,Basal Anterior,Basal Anteroseptal,Basal Inferoseptal,Basal Inferior,Basal Inferolateral,Basal Anterolateral,Mid Anterior,Mid Anteroseptal,Mid Inferoseptal,Mid Inferior,Mid Inferolateral,Mid Anterolateral,Apical Anterior,Apical Anteroseptal,Apical Inferoseptal,Apical Inferior,Apical Inferolateral,Apical Anterolateral
+mean_strain_avc_1,-17,-15,-15,-18,-18,-18,-20,-22,-18,-20,-20,-19,-26,-27,-25,-27,-25,-25
+median_strain_avc_1,-17,-15,-15,-18,-18,-18,-21,-23,-18,-20,-20,-19,-26,-27,-25,-27,-25,-25
+mean_strain_avc_2,-16,-13,-11,-17,-17,-17,-19,-22,-17,-19,-19,-18,-24,-28,-26,-26,-25,-25
+median_strain_avc_2,-15,-13,-11,-16,-16,-16,-19,-22,-16,-18,-19,-18,-25,-28,-25,-25,-25,-24
+mean_strain_avc_0,-18,-17,-16,-19,-18,-19,-19,-22,-19,-21,-20,-20,-22,-26,-24,-25,-22,-24
+median_strain_avc_0,-18,-16,-16,-19,-18,-18,-19,-22,-19,-21,-19,-20,-20,-25,-24,-24,-21,-23
+mean_strain_min_1,-18,-16,-16,-19,-19,-19,-21,-23,-19,-21,-20,-20,-27,-28,-26,-28,-26,-25
+median_strain_min_1,-18,-16,-16,-19,-19,-19,-21,-23,-18,-20,-20,-20,-27,-28,-26,-28,-26,-25
+mean_strain_min_2,-17,-15,-13,-17,-18,-18,-19,-23,-18,-20,-20,-19,-25,-29,-27,-28,-26,-25
+median_strain_min_2,-17,-15,-12,-17,-17,-17,-20,-23,-18,-19,-20,-19,-26,-28,-26,-26,-26,-24
+mean_strain_min_0,-18,-18,-17,-20,-19,-20,-20,-23,-20,-21,-21,-20,-22,-26,-25,-26,-23,-25
+median_strain_min_0,-19,-18,-17,-20,-19,-19,-19,-23,-20,-22,-19,-21,-20,-26,-25,-24,-23,-23
