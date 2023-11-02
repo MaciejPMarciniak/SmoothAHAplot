@@ -148,3 +148,4 @@ class Widget(QWidget):
             plot = aha.AHA(case_data, plot_type=self.plot_type)
             plot.bullseye_smooth(True)
             plt.savefig(path / f"{case}_{self.plot_type}.png")
+            plt.close()
