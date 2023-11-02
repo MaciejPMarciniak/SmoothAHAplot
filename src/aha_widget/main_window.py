@@ -26,7 +26,7 @@ class MainWindow(QMainWindow):
         # Data file input
         data_file_action = QAction("Data file", self)
         data_file_action.setShortcut(QKeySequence.Open)
-        data_file_action.triggered.connect(self.open_data_file)
+        data_file_action.triggered.connect(self._open_data_file)
         self.file_menu.addAction(data_file_action)
 
         # Exit QAction
@@ -43,7 +43,16 @@ class MainWindow(QMainWindow):
         geometry = self.screen().availableGeometry()
         self.setFixedSize(geometry.width() * 0.8, geometry.height() * 0.7)
 
-    def build_widget(self, filename: Path) -> None:
+    @Slot()
+    def _open_data_file(self) -> None:
+        data_folder = Path().resolve() / "data"
+
+        filename, _ = QFileDialog.getOpenFileName(
+            self, "Open Data File", str(data_folder), "CSV Files (*.csv)"
+        )
+        self._build_widget(Path(filename))
+
+    def _build_widget(self, filename: Path) -> None:
         data = read_data.read_data(filename)
         case_id = data.index[0]
         plot_type = filename.stem.split("_")[0]
@@ -53,12 +62,3 @@ class MainWindow(QMainWindow):
         )
         self.plot_widget.setParent(self)
         self.setCentralWidget(self.plot_widget)
-
-    @Slot()
-    def open_data_file(self) -> None:
-        data_folder = Path().resolve() / "data"
-
-        filename, _ = QFileDialog.getOpenFileName(
-            self, "Open Data File", str(data_folder), "CSV Files (*.csv)"
-        )
-        self.build_widget(Path(filename))
