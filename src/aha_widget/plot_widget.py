@@ -29,9 +29,6 @@ class PlotWidget(QWidget):
 
         self._plot()
 
-    def create_plot(self) -> None:
-        self._plot()
-
     def update_plot(
         self, data: pd.DataFrame | None, case_id: str | pd.Index, plot_type: str
     ) -> None:
