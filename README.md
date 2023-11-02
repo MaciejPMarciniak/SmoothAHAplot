@@ -36,10 +36,10 @@ anteroseptal, apical inferoseptal, apical inferior, apical inferolateral, and ap
 ---
 # Screenshots
 ### 17 AHA plot of Myocardial Work
-![smooth plots](images/17_AHA_MW.png  "17 AHA plot of Myocardial Work")
+![smooth plots](legacy/images/17_AHA_MW.png  "17 AHA plot of Myocardial Work")
 
 ### 18 AHA plot of Segmental Strain
-![smooth plots](images/18_AHA_strain.png  "17 AHA plot of Segmental Strain")
+![smooth plots](legacy/images/18_AHA_strain.png  "17 AHA plot of Segmental Strain")
 
 ---
 # How2use
